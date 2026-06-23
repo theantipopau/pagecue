@@ -8,3 +8,22 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 
 - Documentation foundation: `README.md`, `CLAUDE.md`, `AGENTS.md`, and `docs/{PRODUCT_SPEC,ARCHITECTURE,DATA_MODEL,AI_RECAP_PIPELINE,SPOILER_SAFETY,DESIGN_SYSTEM,SECURITY_AND_PRIVACY,ACCESSIBILITY,TESTING,DEPLOYMENT,ROADMAP,DECISIONS}.md`.
 - Application foundation: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4, scaffolded via `create-next-app` and merged into the repository alongside existing `docs/` and `images/`.
+- Editorial design system: warm-paper/charcoal light and dark themes via CSS custom properties, class-based dark mode toggle (`ThemeToggle`), reduced-motion support, skip link, and a responsive app shell (header/footer/nav).
+- Core domain model: book, library item, reading progress, story segment/snapshot, and recap types (`src/domain/**`), plus the `BookSearchProvider`, `RecapProvider`, `LibraryRepository`, and `StorySourceRepository` interfaces from the architecture spec.
+- Original synthetic demonstration novel, _The Lanternkeeper's Atlas_ by the fictional Mirela Voss: six chapters, five recurring characters, two locations, a central unresolved mystery, an evolving ally/suspect relationship, and one thread that resolves early and one that resolves late (`src/data/demo`).
+- Six strictly cumulative story snapshots (one per chapter boundary) with characters, events, locations, and open/resolved threads that never reference information beyond their boundary.
+- Deterministic spoiler-safety validator (`validateRecap`) rejecting unknown segments, future-segment references, cross-book segment references, boundary-label mismatches, unsupported/premature-resolution claims, and unsafe markup or future-oriented phrasing - never displays unvalidated model output.
+- Deterministic recap derivation (`buildRecapFromSnapshot`) and a zero-credential `MockRecapProvider` that serves pre-derived quick/standard/detailed recaps for every supported boundary, still subject to full validation before display.
+- `SyntheticStorySourceRepository` (book support + boundary-limited snapshot retrieval) and `LocalLibraryRepository` (versioned, schema-validated, corruption-recovering guest shelf in `localStorage`, seeded with the demo book).
+- Safe boundary-mapping logic (`selectSafeBoundary`) for chapter/percentage/page progress that always chooses the earlier supported boundary and labels page-based mapping as approximate without an exact page map.
+- First complete vertical slice: landing page -> guest mode (`/app`) -> demo book detail (`/library/[id]`) -> progress editor with boundary confirmation (`/library/[id]/progress`) -> recap setup and result (`/library/[id]/recap`), backed by a validated `POST /api/recap` route with basic in-memory rate limiting.
+- Baseline security headers (CSP, frame protection, referrer policy, permissions policy) in `next.config.ts`; PWA manifest via `src/app/manifest.ts`.
+- Unit tests (Vitest) for the spoiler-safety validator against six malicious fixtures and every legitimate demo recap, the safe-boundary-selection logic, and the local library repository's persistence/seed/corruption-recovery behavior (38 tests).
+- End-to-end tests (Playwright, desktop + mobile viewports) covering the landing page, the full guest-mode recap flow, shelf persistence across reload, and keyboard reachability of the primary flow.
+
+### Known limitations
+
+- Search, shelf add/remove UI, and Google Books integration are not yet implemented.
+- No real AI recap provider yet - only the deterministic mock (by design for this phase).
+- No D1/Cloudflare deployment artifacts yet.
+- Recap history and settings/about pages are not yet implemented.

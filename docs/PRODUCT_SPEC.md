@@ -53,14 +53,14 @@ Accounts, social login, payments, subscriptions, public profiles/reviews/ratings
 
 ## Terminology
 
-| Term | Meaning |
-|---|---|
-| Story segment | The smallest ordered unit of story content within a chapter; the atomic unit for spoiler boundaries. |
-| Boundary / boundary ordinal | The maximum segment ordinal a recap is allowed to use. |
-| Story snapshot | The cumulative, reader-safe story state (characters, threads, events) as of a boundary. |
-| Supporting segment IDs | The segment IDs that justify a specific factual claim in a recap; required on every claim. |
-| Detail level | Quick, standard, or detailed recap length. |
-| Confidence | How exactly the user's entered progress maps to a supported boundary (`exact`/`high`/`medium`/`low`). |
+| Term                        | Meaning                                                                                               |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Story segment               | The smallest ordered unit of story content within a chapter; the atomic unit for spoiler boundaries.  |
+| Boundary / boundary ordinal | The maximum segment ordinal a recap is allowed to use.                                                |
+| Story snapshot              | The cumulative, reader-safe story state (characters, threads, events) as of a boundary.               |
+| Supporting segment IDs      | The segment IDs that justify a specific factual claim in a recap; required on every claim.            |
+| Detail level                | Quick, standard, or detailed recap length.                                                            |
+| Confidence                  | How exactly the user's entered progress maps to a supported boundary (`exact`/`high`/`medium`/`low`). |
 
 ## Success indicators
 

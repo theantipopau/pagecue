@@ -9,6 +9,7 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Context:** The repository contained only `docs/PAGECUE_CLAUDE_BUILD_PROMPT.md` and brand images. No existing application code or technology stack to preserve.
 
 **Options considered:**
+
 - Hand-roll a Next.js project file by file.
 - Use `create-next-app` to scaffold, then merge into the existing repo.
 
@@ -53,3 +54,20 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Consequences:** The validator is exercised against both legitimate and adversarial fixtures even though no live model is involved yet, proving the safety boundary independent of any specific AI vendor.
 
 **Revisit trigger:** Stage 11, when a real provider is introduced.
+
+---
+
+## 2026-06-23 — "Premature resolution" detection uses evidence-set comparison, not NLU
+
+**Context:** Build prompt §31.2 asks for a malicious fixture where a recap "claims an open thread is resolved too early." The validator (`src/domain/recap/validator.ts`) has no language understanding — it can only check segment-ID provenance — so it cannot literally verify a free-text claim's truth.
+
+**Options considered:**
+- Skip this check; rely only on segment-ID provenance checks.
+- Add an LLM-based semantic check (a second model call to judge the first model's output).
+- Add a deterministic, evidence-set-based heuristic.
+
+**Choice:** The validator scans `currentSituation` text for a fixed list of resolution-claiming phrases (e.g. "is now resolved", "mystery is solved"). If found, it requires at least one of that claim's `supportingSegmentIds` to be in `resolvedThreadEvidenceSegmentIds` - the set of segment IDs that the snapshot's own `resolvedThreads` actually point to. A claim using resolution language without citing real resolution evidence is rejected as `UNSUPPORTED_CLAIM`.
+
+**Consequences:** This catches the concrete fixture in `src/data/demo/malicious-fixtures.ts` (`prematurelyResolvedThreadRecap`) deterministically, with no model call and no risk of the *checker* itself hallucinating. It is intentionally a narrow, keyword-based heuristic, not general claim verification - documented as a known limitation in `docs/SPOILER_SAFETY.md`.
+
+**Revisit trigger:** If a real provider's output produces resolution claims that don't match these fixed phrases, expand the phrase list rather than introducing a second model-based judge (which would reintroduce the risk this check exists to avoid).

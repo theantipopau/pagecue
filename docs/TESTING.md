@@ -20,14 +20,14 @@
 
 `src/data/demo/malicious-fixtures.ts` defines one adversarial `RecapSchema`-shaped object per rejection reason:
 
-| Fixture | Expected rejection |
-|---|---|
-| `futureSegmentRecap` | `FUTURE_SEGMENT_REFERENCE` |
-| `unknownSegmentRecap` | `UNKNOWN_SEGMENT` |
-| `wrongBookSegmentRecap` | `BOOK_MISMATCH` |
+| Fixture                          | Expected rejection                                                                             |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `futureSegmentRecap`             | `FUTURE_SEGMENT_REFERENCE`                                                                     |
+| `unknownSegmentRecap`            | `UNKNOWN_SEGMENT`                                                                              |
+| `wrongBookSegmentRecap`          | `BOOK_MISMATCH`                                                                                |
 | `prematurelyResolvedThreadRecap` | `UNSUPPORTED_CLAIM` (resolved-thread claim with no valid supporting evidence at this boundary) |
-| `boundaryLabelMismatchRecap` | `BOUNDARY_MISMATCH` |
-| `noEvidenceRecap` | `SCHEMA_INVALID` (schema requires ≥1 supporting segment per claim) |
+| `boundaryLabelMismatchRecap`     | `BOUNDARY_MISMATCH`                                                                            |
+| `noEvidenceRecap`                | `SCHEMA_INVALID` (schema requires ≥1 supporting segment per claim)                             |
 
 `src/domain/recap/__tests__/validator.test.ts` asserts every fixture is rejected with the exact reason above, and that the legitimate mock recaps in `src/data/demo/mock-recaps.ts` are all accepted.
 

@@ -17,7 +17,7 @@ A book is split into ordered `StorySegment`s, each tagged with `chapterOrdinal` 
 
 ## Snapshot construction
 
-A `StorySnapshot` is the cumulative, reader-safe state of the story *as of* a given `boundarySegmentOrdinal` — characters known so far, their current (not future) state, locations introduced so far, events that have happened, and threads that are open vs. resolved at that point. Snapshots are strictly additive and never retroactively edited with future knowledge (build prompt §16, §4.3). In Phase 1 these are hand-authored per supported boundary; later phases generate them from ingested+segmented source text.
+A `StorySnapshot` is the cumulative, reader-safe state of the story _as of_ a given `boundarySegmentOrdinal` — characters known so far, their current (not future) state, locations introduced so far, events that have happened, and threads that are open vs. resolved at that point. Snapshots are strictly additive and never retroactively edited with future knowledge (build prompt §16, §4.3). In Phase 1 these are hand-authored per supported boundary; later phases generate them from ingested+segmented source text.
 
 ## Boundary selection
 
@@ -26,6 +26,7 @@ A `StorySnapshot` is the cumulative, reader-safe state of the story *as of* a gi
 ## Recap generation
 
 `RecapProvider.generateRecap(input)` receives only:
+
 - Book title
 - Detail level (`quick` | `standard` | `detailed`)
 - Boundary label

@@ -4,17 +4,17 @@ This is the most important document in the repository. If anything here conflict
 
 ## Threat model
 
-| Threat | Example | Mitigation |
-|---|---|---|
-| Model uses outside/general knowledge of a real book | Recap mentions a twist from the model's training data, not the supplied snapshot | §4.2 system instruction prohibition + structured-input-only design; Phase 1 ships no real-book recap path at all |
-| Model receives future content | A later snapshot accidentally included in the request | Retrieval only ever fetches the snapshot at or below the confirmed boundary (`StorySourceRepository.getSnapshotAtBoundary`) |
-| Model output references a segment beyond the boundary | A claim cites a segment ID with `segmentOrdinal > boundary` | Deterministic validator rejects (`FUTURE_SEGMENT_REFERENCE`) |
-| Model output references a nonexistent or wrong-book segment | Hallucinated or cross-contaminated segment ID | Validator rejects (`UNKNOWN_SEGMENT` / `BOOK_MISMATCH`) |
-| Model claims a thread is resolved before it actually is | "The mystery is solved" before the resolving segment | Snapshot data is authored so `openThreads`/`resolvedThreads` are only ever correct as of the boundary; validator additionally rejects claims with no supporting segment |
-| Unsupported claim with no evidence | A factual sentence with zero `supportingSegmentIds` | Schema requires ≥1 supporting segment per claim; validator rejects `UNSUPPORTED_CLAIM` |
-| Unsafe markup in output | HTML/script injected into a text field | Validator rejects `UNSAFE_CONTENT`; UI renders all recap text, never `dangerouslySetInnerHTML` |
-| Page progress silently treated as exact | User enters page 214, app implies the boundary is precise | UI always labels page-based mapping confidence (`exact`/`high`/`medium`/`low`) and never auto-advances to a later boundary |
-| Unsupported title fabricates a recap | A book with no approved structured source still produces something | `StorySourceRepository.getBookSupport()` gates the recap UI entirely; there is no fallback path that invents content |
+| Threat                                                      | Example                                                                          | Mitigation                                                                                                                                                              |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Model uses outside/general knowledge of a real book         | Recap mentions a twist from the model's training data, not the supplied snapshot | §4.2 system instruction prohibition + structured-input-only design; Phase 1 ships no real-book recap path at all                                                        |
+| Model receives future content                               | A later snapshot accidentally included in the request                            | Retrieval only ever fetches the snapshot at or below the confirmed boundary (`StorySourceRepository.getSnapshotAtBoundary`)                                             |
+| Model output references a segment beyond the boundary       | A claim cites a segment ID with `segmentOrdinal > boundary`                      | Deterministic validator rejects (`FUTURE_SEGMENT_REFERENCE`)                                                                                                            |
+| Model output references a nonexistent or wrong-book segment | Hallucinated or cross-contaminated segment ID                                    | Validator rejects (`UNKNOWN_SEGMENT` / `BOOK_MISMATCH`)                                                                                                                 |
+| Model claims a thread is resolved before it actually is     | "The mystery is solved" before the resolving segment                             | Snapshot data is authored so `openThreads`/`resolvedThreads` are only ever correct as of the boundary; validator additionally rejects claims with no supporting segment |
+| Unsupported claim with no evidence                          | A factual sentence with zero `supportingSegmentIds`                              | Schema requires ≥1 supporting segment per claim; validator rejects `UNSUPPORTED_CLAIM`                                                                                  |
+| Unsafe markup in output                                     | HTML/script injected into a text field                                           | Validator rejects `UNSAFE_CONTENT`; UI renders all recap text, never `dangerouslySetInnerHTML`                                                                          |
+| Page progress silently treated as exact                     | User enters page 214, app implies the boundary is precise                        | UI always labels page-based mapping confidence (`exact`/`high`/`medium`/`low`) and never auto-advances to a later boundary                                              |
+| Unsupported title fabricates a recap                        | A book with no approved structured source still produces something               | `StorySourceRepository.getBookSupport()` gates the recap UI entirely; there is no fallback path that invents content                                                    |
 
 ## Product rules (non-negotiable)
 
@@ -25,11 +25,11 @@ This is the most important document in the repository. If anything here conflict
 
 ## Future-information risks
 
-The single highest-risk failure mode is a recap that *sounds* plausible but encodes knowledge the reader hasn't reached. This is why validation is deterministic TypeScript, not another model call: an LLM judge could itself be fooled by confident phrasing. The validator only trusts segment-ID membership, which is a closed, checkable set.
+The single highest-risk failure mode is a recap that _sounds_ plausible but encodes knowledge the reader hasn't reached. This is why validation is deterministic TypeScript, not another model call: an LLM judge could itself be fooled by confident phrasing. The validator only trusts segment-ID membership, which is a closed, checkable set.
 
 ## Prompt-level controls
 
-The system instruction (build prompt §19, `src/providers/recap/system-prompt.ts` once a real provider exists) explicitly prohibits outside knowledge, foreshadowing, speculation, invented motives/events, direct quotation, and requires schema-only output with citations. This is a *defense in depth* layer, not the primary control — see validation below.
+The system instruction (build prompt §19, `src/providers/recap/system-prompt.ts` once a real provider exists) explicitly prohibits outside knowledge, foreshadowing, speculation, invented motives/events, direct quotation, and requires schema-only output with citations. This is a _defense in depth_ layer, not the primary control — see validation below.
 
 ## Retrieval controls
 

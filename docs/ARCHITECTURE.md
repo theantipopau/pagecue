@@ -86,12 +86,12 @@ Provider/network errors, schema mismatches, and validator rejections are all cau
 
 ## Trust boundaries
 
-| Boundary | Rule |
-|---|---|
-| Browser ↔ Server | No API keys cross this boundary. Recap output is validated before crossing back. |
-| Server ↔ Google Books | Read-only metadata only; description text is never treated as a recap source. |
-| Server ↔ Recap provider | Provider receives only the structured snapshot + allowed segment IDs, never the full book or general knowledge prompts. |
-| Validator ↔ everything | The validator is the last line of defense and does not trust schema-valid output; it is implemented as plain deterministic TypeScript, not a model call. |
+| Boundary                | Rule                                                                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Browser ↔ Server        | No API keys cross this boundary. Recap output is validated before crossing back.                                                                         |
+| Server ↔ Google Books   | Read-only metadata only; description text is never treated as a recap source.                                                                            |
+| Server ↔ Recap provider | Provider receives only the structured snapshot + allowed segment IDs, never the full book or general knowledge prompts.                                  |
+| Validator ↔ everything  | The validator is the last line of defense and does not trust schema-valid output; it is implemented as plain deterministic TypeScript, not a model call. |
 
 ## Deployment view
 

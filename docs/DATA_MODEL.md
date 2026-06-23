@@ -24,6 +24,7 @@ interface StoredShelfV1 {
 ```
 
 Rules (`src/repositories/library/local-library-repository.ts`):
+
 - Every read is parsed with Zod; invalid/corrupt payloads fall back to an empty, freshly-seeded shelf rather than throwing.
 - Writes are validated before being serialized.
 - A schema version field allows a future migration function to upgrade `v1 → v2` without losing data.

@@ -1,26 +1,105 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: toggling `.dark` on <html> drives all `dark:` utilities. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f2e9;
+  --surface: #fffdf8;
+  --surface-elevated: #ffffff;
+  --foreground: #2a2622;
+  --muted: #ece4d6;
+  --muted-foreground: #6b6258;
+  --border: #e1d8c6;
+  --primary: #2f4d3a;
+  --primary-foreground: #f7f2e9;
+  --success: #3f7a4f;
+  --warning: #9a6b1f;
+  --danger: #8c3a32;
+  --focus-ring: #1f3a8f;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-sm:
+    0 1px 2px rgba(42, 38, 34, 0.06), 0 1px 1px rgba(42, 38, 34, 0.04);
+  --shadow-md:
+    0 4px 12px rgba(42, 38, 34, 0.08), 0 2px 4px rgba(42, 38, 34, 0.05);
+
+  --motion-fast: 120ms;
+  --motion-standard: 200ms;
+  --motion-slow: 360ms;
+
+  --font-serif:
+    ui-serif, Georgia, "Iowan Old Style", "Palatino Linotype",
+    "Times New Roman", serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+.dark {
+  --background: #1c1a17;
+  --surface: #242120;
+  --surface-elevated: #2b2724;
+  --foreground: #f1ebe1;
+  --muted: #322d29;
+  --muted-foreground: #b3a89a;
+  --border: #3a342f;
+  --primary: #6fae84;
+  --primary-foreground: #15211a;
+  --success: #6fae84;
+  --warning: #d6a44a;
+  --danger: #e08478;
+  --focus-ring: #e8c25a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-focus-ring: var(--focus-ring);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
