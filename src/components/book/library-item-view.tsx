@@ -8,15 +8,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { LibraryItem } from "@/domain/library/types";
+import type { LibraryItem, ReadingStatus } from "@/domain/library/types";
 import { formatIsbnForDisplay } from "@/lib/isbn/isbn";
-import { formatReadingStatus } from "@/lib/formatting/reading-status";
+import { READING_STATUS_LABELS } from "@/lib/formatting/reading-status";
 import { localLibraryRepository } from "@/repositories/library/local-library-repository";
+
+const STATUS_OPTIONS: ReadingStatus[] = [
+  "want_to_read",
+  "reading",
+  "paused",
+  "finished",
+];
 
 export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
   const router = useRouter();
   const [item, setItem] = useState<LibraryItem | null | undefined>(undefined);
   const [removing, setRemoving] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -67,6 +75,16 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
     router.push("/app");
   }
 
+  async function handleStatusChange(nextStatus: ReadingStatus) {
+    if (!item) return;
+    setUpdatingStatus(true);
+    const updated = await localLibraryRepository.updateLibraryItem(item.id, {
+      status: nextStatus,
+    });
+    setItem(updated);
+    setUpdatingStatus(false);
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <Link
@@ -88,7 +106,24 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Badge tone="neutral">{formatReadingStatus(item.status)}</Badge>
+            <label htmlFor="reading-status" className="sr-only">
+              Reading status
+            </label>
+            <select
+              id="reading-status"
+              value={item.status}
+              disabled={updatingStatus}
+              onChange={(event) =>
+                handleStatusChange(event.target.value as ReadingStatus)
+              }
+              className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground focus-visible:outline-none"
+            >
+              {STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {READING_STATUS_LABELS[status]}
+                </option>
+              ))}
+            </select>
             {recapSupported ? (
               <Badge tone="brand">Recap available</Badge>
             ) : (

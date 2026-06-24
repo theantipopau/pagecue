@@ -14,6 +14,7 @@ Standing instructions for Claude sessions working in this repository. Read this,
 8. **Update docs and `CHANGELOG.md` as you go**, not as an afterthought. Record expensive-to-reverse decisions in `docs/DECISIONS.md`.
 9. **Preserve Cloudflare Workers compatibility** when adding dependencies — avoid Node-only APIs in code paths that will run on Workers (see `docs/DEPLOYMENT.md`).
 10. **Don't overwrite existing work without understanding it first.** Inspect before replacing.
+11. **Do not add `Co-Authored-By: Claude` (or similar AI co-author) trailers to commits in this repository.** The user asked for sole authorship on GitHub; see `docs/DECISIONS.md` (2026-06-25).
 
 ## Where things live
 

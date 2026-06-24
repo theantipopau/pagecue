@@ -8,7 +8,7 @@ See `docs/PRODUCT_SPEC.md` for the full product spec and `docs/SPOILER_SAFETY.md
 
 ## Current project status
 
-Core experience complete: landing page → guest mode → mock book search → add/remove from shelf → reading-progress boundary confirmation → quick / standard / detailed recap generation and display, with the spoiler boundary and confidence always shown. Google Books integration, D1/Cloudflare, and a real AI provider are not yet implemented — see `docs/ROADMAP.md`.
+Core experience complete: landing page → guest mode → book search (mock or real Google Books) → add/remove from shelf and edit reading status → reading-progress boundary confirmation → quick / standard / detailed recap generation and display, with the spoiler boundary and confidence always shown. D1/Cloudflare and a real AI recap provider are not yet implemented — see `docs/ROADMAP.md`.
 
 ## Technology stack
 
@@ -67,7 +67,7 @@ Mock mode is the default and is not a degraded experience — it's how PageCue r
 
 ## Google Books setup (optional)
 
-Set `BOOK_SEARCH_PROVIDER=google` and `GOOGLE_BOOKS_API_KEY=<your key>` in `.env.local`. Not yet wired up in this slice — tracked in `docs/ROADMAP.md`.
+Set `BOOK_SEARCH_PROVIDER=google` and `GOOGLE_BOOKS_API_KEY=<your key>` in `.env.local`, then restart the dev server. Search will query the real Google Books API server-side (the key is never sent to the browser); results are normalized into PageCue's own book/edition shape, and only the in-repo demo book will ever show recap support. If `BOOK_SEARCH_PROVIDER=google` is set without a key, PageCue logs a warning and falls back to the mock provider rather than breaking search.
 
 ## AI provider setup (optional, future)
 
@@ -87,12 +87,11 @@ See `docs/DEPLOYMENT.md`.
 
 ## Known limitations
 
-- Book search only queries a small set of in-repo mock catalogue fixtures, not a real book database. Google Books integration is not yet built.
+- Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
 - No real AI recap provider exists yet — only the deterministic mock.
 - No D1/Cloudflare deployment artifacts exist yet.
 - A PWA manifest exists (`src/app/manifest.ts`), but there is no service worker yet, so offline behavior is whatever the browser caches by default.
-- Playwright e2e coverage exists for the flows that ship today (landing, guest mode, search, add/remove, demo recap flow, persistence, keyboard nav, mobile viewport), not the full 20-step flow in the build prompt.
-- Reading status changes (want-to-read/reading/paused/finished) are not yet editable from the UI — new shelf items default to "want to read"; only progress entry currently advances status to "reading".
+- Playwright e2e coverage exists for the flows that ship today (landing, guest mode, search, add/remove, status editing, demo recap flow, persistence, keyboard nav, mobile viewport), not the full 20-step flow in the build prompt, and does not exercise the real Google Books API (covered by unit tests with a mocked `fetch` instead).
 
 ## Roadmap
 

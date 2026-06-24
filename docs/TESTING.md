@@ -9,14 +9,15 @@
 ## Unit test coverage (current + planned per build prompt §31.1)
 
 - ISBN normalization, ISBN-10/13 checksum validation, ISBN-10→13 conversion, display formatting, and search-text-vs-ISBN classification (`src/lib/isbn`).
-- Mock book search matching by title/author/ISBN, multi-edition results, and missing-cover/page-count/ISBN handling (`src/providers/book-search`). Google Books result normalization and duplicate-edition handling against a real provider are planned for the metadata-integration stage.
+- Mock book search matching by title/author/ISBN, multi-edition results, and missing-cover/page-count/ISBN handling (`src/providers/book-search`).
+- Google Books result normalization (with a mocked `fetch`): typical volumes, missing title/cover/description/page-count/ISBN, duplicate volume IDs, multi-edition grouping, ISBN-prefixed queries, non-OK HTTP status, network failure/timeout, and malformed response shapes (`src/providers/book-search/__tests__/google-books-provider.test.ts`).
 - Reading progress validation, safe boundary selection (always the earlier supported boundary), `mappingConfidence` derivation (`src/domain/progress`).
 - Story snapshot retrieval restricted to ≤ boundary (`src/repositories/story-source`).
 - Recap schema validation and every spoiler-validator rejection reason (`src/domain/recap`).
 - Local library repository persistence, schema versioning/migration, corrupt-data recovery (`src/repositories/library`).
 - Environment configuration parsing (`src/config/env.ts`).
 
-68 unit tests currently pass across 5 test files.
+78 unit tests currently pass across 6 test files.
 
 ## Malicious spoiler fixtures (build prompt §31.2)
 
@@ -35,12 +36,12 @@
 
 ## Playwright flows (build prompt §31.3 — staged)
 
-The full 20-step flow is the target once Google Books integration and recap history exist. Two specs currently cover the flows that exist:
+The full 20-step flow is the target once recap history and settings/about exist. Two specs currently cover the flows that exist:
 
 - `tests/e2e/demo-recap-flow.spec.ts` — landing → guest mode → demo book → boundary confirmation → quick/standard/detailed recap → boundary display → shelf persistence across reload → keyboard reachability.
-- `tests/e2e/search-and-shelf.spec.ts` — title/author/ISBN search, multi-edition warnings, an honest empty state, add-to-shelf, and remove-from-shelf from both the shelf dashboard and the book detail page.
+- `tests/e2e/search-and-shelf.spec.ts` — title/author/ISBN search, multi-edition warnings, an honest empty state, add-to-shelf, remove-from-shelf from both the shelf dashboard and the book detail page, and reading-status editing.
 
-20 e2e runs currently pass (both specs × desktop and mobile viewports). Remaining flows (Google Books, recap history) are tracked in `docs/ROADMAP.md` and added alongside the pages that make them meaningful (no point scripting a flow against a page that doesn't exist yet).
+22 e2e runs currently pass (both specs × desktop and mobile viewports), against the mock book search provider - the real Google Books integration is exercised by unit tests with a mocked `fetch` instead, not e2e, since it depends on an external network call and an API key. Remaining flows (recap history, settings/about) are tracked in `docs/ROADMAP.md` and added alongside the pages that make them meaningful (no point scripting a flow against a page that doesn't exist yet).
 
 ## Quality commands
 

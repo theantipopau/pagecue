@@ -32,10 +32,19 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - Fixed a hydration-mismatch warning: the inline theme script intentionally mutates `<html>`'s class before React hydrates (to avoid a light/dark flash), which is expected and now marked with `suppressHydrationWarning` rather than logging a spurious warning on every load.
 - Extended the Playwright suite with a second spec (`tests/e2e/search-and-shelf.spec.ts`) covering search, ISBN search, multi-edition warnings, add-to-shelf, remove-from-shelf from both entry points, and the empty-results state (20 e2e runs total across desktop and mobile). Unit test count: 68.
 
+### Added (Google Books integration and editable reading status)
+
+- `GoogleBooksProvider` (`src/providers/book-search/google-books-provider.ts`): a server-only adapter over the real Google Books API, selected via `BOOK_SEARCH_PROVIDER=google` + `GOOGLE_BOOKS_API_KEY`. Normalizes Google's volume shape into PageCue's own book/edition types (independent of Google's response format), routes ISBN-classified queries as `isbn:<value>` lookups, deduplicates repeated volume IDs, and flags multiple editions of the same work the same way the mock provider does.
+- Defensive handling for the real provider: a bounded 8-second request timeout with no retry loop, explicit handling for HTTP 429 and other non-OK statuses, unparseable JSON, and a Zod-validated response shape that degrades to an empty result set (not an error) on an unrecognized shape - matching the "validate provider responses" requirement in the build prompt.
+- Graceful, logged fallback to the mock provider when `BOOK_SEARCH_PROVIDER=google` is set without `GOOGLE_BOOKS_API_KEY`, keeping the zero-credential default working even with a partially-set environment (`src/config/providers.ts`).
+- Editable reading status (want to read / reading / paused / finished) directly from the book detail page, persisted through the existing `LocalLibraryRepository`.
+- 10 new unit tests for `GoogleBooksProvider` (mocked `fetch`): normalization, missing title/cover/description/page-count/ISBN, deduplication, multi-edition flagging, ISBN-prefixed queries, non-OK status, network failure, and malformed response shape (78 unit tests total).
+- One new Playwright test covering reading-status editing and its persistence across reload (22 e2e runs total).
+- Connected the repository to its GitHub remote (`github.com/theantipopau/pagecue`) and pushed `main`.
+
 ### Known limitations
 
-- Book search only queries a small set of in-repo mock catalogue fixtures, not a real book database; Google Books integration is not yet implemented.
+- Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
 - No real AI recap provider yet - only the deterministic mock (by design for this phase).
 - No D1/Cloudflare deployment artifacts yet.
 - Recap history and settings/about pages are not yet implemented.
-- Reading status is not yet directly editable from the UI (it advances implicitly from "want to read" to "reading" when progress is first set).

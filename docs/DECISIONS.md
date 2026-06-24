@@ -84,3 +84,27 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Consequences:** `docs/DESIGN_SYSTEM.md`'s token table needs updating to match (tracked as a follow-up); all primary buttons and the brand badge now visually match the supplied logo in both themes.
 
 **Revisit trigger:** If a future brand refresh changes the logo colors.
+
+---
+
+## 2026-06-25 — Google Books has no "work" ID; synthesized one from a title+author slug
+
+**Context:** PageCue's domain model splits `BookSummary` (the work) from `BookEdition` (a specific printing), so the UI can warn when a search matches multiple editions of the same book. The Google Books volumes API has no equivalent "work" concept - every result is an independent `volume` with its own ID, even when two volumes are clearly the same book in different formats.
+
+**Choice:** `normalizeGoogleVolume` derives a deterministic `book.id` as `google-work-<slug(title + first author)>`, so two volumes with the same title and first author collapse into the same `book.id` and get flagged `hasMultipleEditions`, mirroring how the mock provider already behaves. `edition.id` remains `google-volume-<google's volume id>`, which is always unique and used for shelf deduplication.
+
+**Consequences:** This is a heuristic, not a guarantee - a reprint with a slightly different title or author ordering won't be grouped, and two unrelated books that coincidentally share a title and a same-named first author would be (wrongly) grouped. Accepted as a reasonable approximation for Phase 1; revisit if Google's API or a future licensed catalogue (Phase 4) provides a real work identifier.
+
+**Revisit trigger:** If false groupings or missed groupings are reported, or when a licensed catalogue with real work IDs replaces this provider.
+
+---
+
+## 2026-06-25 — Connected the repository to its GitHub remote, no Claude co-author trailers
+
+**Context:** The user created `github.com/theantipopau/pagecue` and asked for the local repository to be pushed there, explicitly requesting that Claude not appear as a contributor - only them.
+
+**Choice:** Added the remote, renamed the local `master` branch to `main` (the repo was empty, so no conflict), and pushed. Before pushing, rewrote the four existing local-only commits (via `git filter-branch --msg-filter`) to strip the `Co-Authored-By: Claude Sonnet 4.6` trailer each commit message previously had - safe to do because nothing had been pushed anywhere yet, so no shared history was disturbed. Commit `Author`/`Committer` fields were already the user's own local git identity (see the 2026-06-23 "Git repository initialized locally" entry above), so only the trailer needed removing. Future commits in this repository omit the trailer.
+
+**Consequences:** GitHub's contributor graph and commit list will show only the user as author. This instruction is repository-specific context for future sessions: do not add `Co-Authored-By: Claude` trailers to commits in this repository.
+
+**Revisit trigger:** None expected; flag to the user if they ever ask to restore co-author attribution.

@@ -76,4 +76,20 @@ test.describe("PageCue search and shelf management", () => {
     await expect(page).toHaveURL(/\/app$/);
     await expect(page.getByText("Your shelf is empty.")).toBeVisible();
   });
+
+  test("reading status can be changed from the book detail page", async ({
+    page,
+  }) => {
+    await page.goto("/app");
+    await page.getByRole("link", { name: "Open" }).first().click();
+    await expect(
+      page.getByRole("heading", { name: "The Lanternkeeper's Atlas" }),
+    ).toBeVisible();
+
+    await page.getByLabel("Reading status").selectOption("paused");
+    await expect(page.getByLabel("Reading status")).toHaveValue("paused");
+
+    await page.reload();
+    await expect(page.getByLabel("Reading status")).toHaveValue("paused");
+  });
 });

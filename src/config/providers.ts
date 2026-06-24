@@ -3,6 +3,7 @@ import type { RecapProvider } from "@/domain/recap/provider";
 import type { SegmentReference } from "@/domain/recap/validator";
 import type { StorySourceRepository } from "@/domain/story/repository";
 import { demoSegments } from "@/data/demo/segments";
+import { GoogleBooksProvider } from "@/providers/book-search/google-books-provider";
 import { MockBookSearchProvider } from "@/providers/book-search/mock-book-search-provider";
 import { MockRecapProvider } from "@/providers/recap/mock-recap-provider";
 import { SyntheticStorySourceRepository } from "@/repositories/story-source/synthetic-story-source-repository";
@@ -13,10 +14,19 @@ export function getBookSearchProvider(): BookSearchProvider {
   switch (appEnv.BOOK_SEARCH_PROVIDER) {
     case "mock":
       return new MockBookSearchProvider();
-    case "google":
-      throw new Error(
-        "BOOK_SEARCH_PROVIDER=google is not implemented yet (see docs/ROADMAP.md). Use 'mock'.",
-      );
+    case "google": {
+      const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+      if (!apiKey) {
+        // Build prompt §4.4/§10: the default local mode must work with no metadata key. Rather
+        // than erroring out when google is requested but unconfigured, fall back to mock so the
+        // app stays usable - this is a deliberately silent, documented fallback, not a hidden one.
+        console.warn(
+          "BOOK_SEARCH_PROVIDER=google but GOOGLE_BOOKS_API_KEY is not set; falling back to the mock book search provider.",
+        );
+        return new MockBookSearchProvider();
+      }
+      return new GoogleBooksProvider(apiKey);
+    }
   }
 }
 
