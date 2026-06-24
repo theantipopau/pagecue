@@ -13,17 +13,19 @@ Tracked against the implementation sequence in the build prompt (§39) and the P
 - Guest shelf local repository (versioned `localStorage`, schema-validated, corrupt-data recovery, seeded with the demo book).
 - Complete vertical slice: landing page → guest mode (`/app`, shelf dashboard) → demo book detail (`/library/[id]`) → progress editor with boundary confirmation (`/library/[id]/progress`) → recap setup and result (`/library/[id]/recap`), with boundary label and confidence always shown.
 - Baseline security headers (CSP, frame protection, referrer/permissions policy) and a PWA manifest (`src/app/manifest.ts`).
-- Playwright e2e coverage (desktop + mobile viewports) for the landing page, the full guest-mode recap flow, shelf persistence across reload, and keyboard reachability - scoped to the flow that exists today, not yet the full 20-step flow in build prompt §31.3.
+- Brand identity integrated: logo in header/landing/favicon/manifest icons/Open Graph image, and `--primary`/`--accent` design tokens re-themed to the logo's navy/teal.
+- ISBN utilities (normalize, validate ISBN-10/13, convert, format, classify search input) with unit tests.
+- Mock book search (`MockBookSearchProvider` + `/search` page) matching by title/author/ISBN, with mock catalogue fixtures covering missing metadata and multi-edition warnings.
+- Add-to-shelf from search and remove-from-shelf from both the shelf dashboard and book detail page.
+- Playwright e2e coverage (desktop + mobile viewports) for the landing page, the full guest-mode recap flow, shelf persistence across reload, keyboard reachability, search, ISBN search, multi-edition warnings, and add/remove-from-shelf (20 e2e runs total) - scoped to the flows that exist today, not yet the full 20-step flow in build prompt §31.3.
 
 ## In progress / immediately next
 
-- Book search page (mock provider) and result cards.
-- Add-to-shelf flow from search results (today the shelf only contains the seeded demo book).
-- Extending Playwright coverage to search, add-to-shelf, and remove-from-shelf once those pages exist.
+- Server-side `GoogleBooksProvider` with normalization and graceful fallback to mock.
+- Editable reading status from the UI (currently only advances implicitly when progress is first set).
 
 ## Planned
 
-- Server-side `GoogleBooksProvider` with normalization, ISBN utilities, and graceful fallback to mock.
 - D1 migrations + `D1LibraryRepository` / `D1StorySourceRepository`, Cloudflare Workers/OpenNext deployment, Wrangler configuration.
 - Real AI recap provider (OpenAI or Anthropic) behind the existing `RecapProvider` interface, reusing the same validator.
 - Recap history view for the demo book.
@@ -36,4 +38,4 @@ Accounts/auth, payments, social features, publisher dashboards, EPUB/PDF ingesti
 
 ## Completion criteria for "Phase 1 done"
 
-See build prompt §40 in full. Not yet satisfied: search, shelf add/remove UI, Google Books integration, D1/Cloudflare, service worker, the full 20-step Playwright flow. Satisfied by this session: local-credential-free run, landing page, guest mode, demo novel, boundary selection, three-tier recap generation with displayed boundary/confidence, unit- and e2e-tested spoiler rejection, light/dark themes, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.
+See build prompt §40 in full. Not yet satisfied: Google Books integration, D1/Cloudflare, service worker, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, mock book search, shelf add/remove, demo novel, boundary selection, three-tier recap generation with displayed boundary/confidence, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.

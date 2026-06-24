@@ -1,12 +1,25 @@
+import type { BookSearchProvider } from "@/domain/books/provider";
 import type { RecapProvider } from "@/domain/recap/provider";
 import type { SegmentReference } from "@/domain/recap/validator";
 import type { StorySourceRepository } from "@/domain/story/repository";
 import { demoSegments } from "@/data/demo/segments";
+import { MockBookSearchProvider } from "@/providers/book-search/mock-book-search-provider";
 import { MockRecapProvider } from "@/providers/recap/mock-recap-provider";
 import { SyntheticStorySourceRepository } from "@/repositories/story-source/synthetic-story-source-repository";
 import { appEnv } from "./env";
 
 /** Server-only provider selection. Never import this from a Client Component. */
+export function getBookSearchProvider(): BookSearchProvider {
+  switch (appEnv.BOOK_SEARCH_PROVIDER) {
+    case "mock":
+      return new MockBookSearchProvider();
+    case "google":
+      throw new Error(
+        "BOOK_SEARCH_PROVIDER=google is not implemented yet (see docs/ROADMAP.md). Use 'mock'.",
+      );
+  }
+}
+
 export function getStorySourceRepository(): StorySourceRepository {
   switch (appEnv.STORY_SOURCE_REPOSITORY) {
     case "synthetic":

@@ -62,12 +62,25 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Context:** Build prompt §31.2 asks for a malicious fixture where a recap "claims an open thread is resolved too early." The validator (`src/domain/recap/validator.ts`) has no language understanding — it can only check segment-ID provenance — so it cannot literally verify a free-text claim's truth.
 
 **Options considered:**
+
 - Skip this check; rely only on segment-ID provenance checks.
 - Add an LLM-based semantic check (a second model call to judge the first model's output).
 - Add a deterministic, evidence-set-based heuristic.
 
 **Choice:** The validator scans `currentSituation` text for a fixed list of resolution-claiming phrases (e.g. "is now resolved", "mystery is solved"). If found, it requires at least one of that claim's `supportingSegmentIds` to be in `resolvedThreadEvidenceSegmentIds` - the set of segment IDs that the snapshot's own `resolvedThreads` actually point to. A claim using resolution language without citing real resolution evidence is rejected as `UNSUPPORTED_CLAIM`.
 
-**Consequences:** This catches the concrete fixture in `src/data/demo/malicious-fixtures.ts` (`prematurelyResolvedThreadRecap`) deterministically, with no model call and no risk of the *checker* itself hallucinating. It is intentionally a narrow, keyword-based heuristic, not general claim verification - documented as a known limitation in `docs/SPOILER_SAFETY.md`.
+**Consequences:** This catches the concrete fixture in `src/data/demo/malicious-fixtures.ts` (`prematurelyResolvedThreadRecap`) deterministically, with no model call and no risk of the _checker_ itself hallucinating. It is intentionally a narrow, keyword-based heuristic, not general claim verification - documented as a known limitation in `docs/SPOILER_SAFETY.md`.
 
 **Revisit trigger:** If a real provider's output produces resolution claims that don't match these fixed phrases, expand the phrase list rather than introducing a second model-based judge (which would reintroduce the risk this check exists to avoid).
+
+---
+
+## 2026-06-24 — Re-themed `--primary`/`--accent` to match the actual brand mark
+
+**Context:** The repository's `images/icon.png` and `images/header.png` are the real PageCue brand mark (navy book/bookmark glyph with a teal sparkle), supplied by the user. The initial design tokens used an invented muted-forest-green accent, which the build prompt allowed ("muted forest green, deep navy, or burgundy") but which didn't match the actual logo once it was incorporated into the UI.
+
+**Choice:** Sampled the logo's real colors (navy ≈ `#1c2a66`, teal ≈ `#0e8c8a`/`#34d8c8`) and replaced `--primary` (navy in light mode, brightened teal in dark mode, since dark navy has poor contrast on a dark charcoal surface) and added a new `--accent`/`--accent-foreground` pair (teal) used for the "Recap available" brand badge. Semantic `--success`/`--warning`/`--danger` were left as conventional green/amber/red rather than overloaded with brand color, to keep status meaning unambiguous.
+
+**Consequences:** `docs/DESIGN_SYSTEM.md`'s token table needs updating to match (tracked as a follow-up); all primary buttons and the brand badge now visually match the supplied logo in both themes.
+
+**Revisit trigger:** If a future brand refresh changes the logo colors.

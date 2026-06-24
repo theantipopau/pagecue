@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -5,7 +6,15 @@ export default function LandingPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20">
       <section className="text-center">
-        <p className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground">
+        <Image
+          src="/icons/icon-192.png"
+          alt="PageCue logo: a stylized open book beneath a bookmarked page with a sparkle cue"
+          width={64}
+          height={64}
+          className="mx-auto"
+          priority
+        />
+        <p className="mt-3 font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground">
           PageCue
         </p>
         <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">

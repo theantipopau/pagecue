@@ -10,24 +10,26 @@ Avoid: gradients, glowing "AI" effects, glassmorphism, heavy drop shadows, dense
 
 Defined as CSS variables in `src/app/globals.css` using Tailwind v4's `@theme` directive, then exposed via Tailwind utility classes (`bg-surface`, `text-foreground`, etc.) through `@theme inline` mappings. Both a `:root` (light) and `.dark` block are defined; theme switching toggles the `dark` class on `<html>`.
 
-| Token                         | Light                   | Dark                                 | Used for                     |
-| ----------------------------- | ----------------------- | ------------------------------------ | ---------------------------- |
-| `--background`                | warm ivory              | deep charcoal-brown                  | page background              |
-| `--surface`                   | paper white             | raised charcoal                      | cards, panels                |
-| `--surface-elevated`          | slightly brighter paper | lighter raised charcoal              | modals, popovers             |
-| `--foreground`                | charcoal                | warm off-white                       | primary text                 |
-| `--muted`                     | soft parchment grey     | muted charcoal                       | secondary surfaces           |
-| `--muted-foreground`          | warm grey               | warm grey-blue                       | secondary text               |
-| `--border`                    | warm light grey         | low-contrast warm grey               | dividers, outlines           |
-| `--primary`                   | deep forest green       | lighter forest green                 | primary actions, links       |
-| `--primary-foreground`        | near-white              | near-white                           | text on primary              |
-| `--success`                   | subdued green           | subdued green (lighter)              | confirmations                |
-| `--warning`                   | warm amber              | warm amber (lighter)                 | approximate/uncertain states |
-| `--danger`                    | restrained brick red    | restrained red (lighter)             | errors, destructive actions  |
-| `--focus-ring`                | high-contrast navy      | high-contrast amber                  | focus indicator              |
-| `--radius-sm/md/lg`           | 6 / 10 / 16px           | same                                 | corner radius scale          |
-| `--shadow-sm/md`              | soft, low-opacity       | soft, low-opacity, slightly stronger | depth                        |
-| `--motion-fast/standard/slow` | 120 / 200 / 360ms       | same                                 | animation durations          |
+| Token                         | Light                   | Dark                                 | Used for                      |
+| ----------------------------- | ----------------------- | ------------------------------------ | ----------------------------- |
+| `--background`                | warm ivory              | deep charcoal-brown                  | page background               |
+| `--surface`                   | paper white             | raised charcoal                      | cards, panels                 |
+| `--surface-elevated`          | slightly brighter paper | lighter raised charcoal              | modals, popovers              |
+| `--foreground`                | charcoal                | warm off-white                       | primary text                  |
+| `--muted`                     | soft parchment grey     | muted charcoal                       | secondary surfaces            |
+| `--muted-foreground`          | warm grey               | warm grey-blue                       | secondary text                |
+| `--border`                    | warm light grey         | low-contrast warm grey               | dividers, outlines            |
+| `--primary`                   | brand navy (`#1c2a66`)  | brand teal (`#34d8c8`)               | primary actions, links        |
+| `--primary-foreground`        | near-white              | near-black teal tint                 | text on primary               |
+| `--accent`                    | brand teal (`#0e8c8a`)  | lighter brand teal (`#4fd8d4`)       | brand highlight (recap badge) |
+| `--accent-foreground`         | near-white              | near-black teal tint                 | text on accent                |
+| `--success`                   | subdued green           | subdued green (lighter)              | confirmations                 |
+| `--warning`                   | warm amber              | warm amber (lighter)                 | approximate/uncertain states  |
+| `--danger`                    | restrained brick red    | restrained red (lighter)             | errors, destructive actions   |
+| `--focus-ring`                | high-contrast navy      | high-contrast amber                  | focus indicator               |
+| `--radius-sm/md/lg`           | 6 / 10 / 16px           | same                                 | corner radius scale           |
+| `--shadow-sm/md`              | soft, low-opacity       | soft, low-opacity, slightly stronger | depth                         |
+| `--motion-fast/standard/slow` | 120 / 200 / 360ms       | same                                 | animation durations           |
 
 ## Typography
 

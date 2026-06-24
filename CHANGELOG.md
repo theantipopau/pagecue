@@ -21,9 +21,21 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - Unit tests (Vitest) for the spoiler-safety validator against six malicious fixtures and every legitimate demo recap, the safe-boundary-selection logic, and the local library repository's persistence/seed/corruption-recovery behavior (38 tests).
 - End-to-end tests (Playwright, desktop + mobile viewports) covering the landing page, the full guest-mode recap flow, shelf persistence across reload, and keyboard reachability of the primary flow.
 
+### Added (book search, shelf management, and brand identity)
+
+- Brand identity applied throughout: the supplied PageCue logo (navy book/bookmark mark with a teal sparkle) now appears in the header, landing page, favicon, PWA manifest icons, and a generated Open Graph social-share image (`src/app/opengraph-image.tsx`). Re-themed `--primary`/`--accent` design tokens to the logo's actual navy/teal rather than the originally invented forest green (see `docs/DECISIONS.md`).
+- ISBN utilities (`src/lib/isbn`): ISBN-10/13 normalization, checksum validation, ISBN-10→13 conversion, display formatting, and search-input classification (ISBN vs. ISBN-shaped-but-invalid vs. free text), with unit tests.
+- `BookSearchProvider` interface and a deterministic `MockBookSearchProvider` matching by title/author substring or exact ISBN, backed by mock catalogue fixtures that exercise missing covers, missing page counts, missing ISBNs, and duplicate/multi-edition results - none of which claim recap support except the demo book.
+- `/search` page: search by title, author, or ISBN; result cards with cover, metadata, edition-ambiguity warnings, and an honest "recap unavailable for this title" badge for every non-demo result; loading/error/empty states.
+- Add-to-shelf from search results and remove-from-shelf from both the shelf dashboard and the book detail page (with a confirmation prompt), wired through the existing `LocalLibraryRepository`.
+- `GET /api/search` route (rate-limited, Zod-validated) selecting the book search provider server-side, matching the existing `/api/recap` pattern.
+- Fixed a hydration-mismatch warning: the inline theme script intentionally mutates `<html>`'s class before React hydrates (to avoid a light/dark flash), which is expected and now marked with `suppressHydrationWarning` rather than logging a spurious warning on every load.
+- Extended the Playwright suite with a second spec (`tests/e2e/search-and-shelf.spec.ts`) covering search, ISBN search, multi-edition warnings, add-to-shelf, remove-from-shelf from both entry points, and the empty-results state (20 e2e runs total across desktop and mobile). Unit test count: 68.
+
 ### Known limitations
 
-- Search, shelf add/remove UI, and Google Books integration are not yet implemented.
+- Book search only queries a small set of in-repo mock catalogue fixtures, not a real book database; Google Books integration is not yet implemented.
 - No real AI recap provider yet - only the deterministic mock (by design for this phase).
 - No D1/Cloudflare deployment artifacts yet.
 - Recap history and settings/about pages are not yet implemented.
+- Reading status is not yet directly editable from the UI (it advances implicitly from "want to read" to "reading" when progress is first set).

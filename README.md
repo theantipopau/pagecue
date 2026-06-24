@@ -8,7 +8,7 @@ See `docs/PRODUCT_SPEC.md` for the full product spec and `docs/SPOILER_SAFETY.md
 
 ## Current project status
 
-First vertical slice complete: landing page → guest mode → synthetic demonstration novel → reading-progress boundary confirmation → quick / standard / detailed recap generation and display, with the spoiler boundary and confidence always shown. The guest shelf is currently read-only (seeded with the demo book; no add/remove UI yet). Search, Google Books integration, D1/Cloudflare, and a real AI provider are not yet implemented — see `docs/ROADMAP.md`.
+Core experience complete: landing page → guest mode → mock book search → add/remove from shelf → reading-progress boundary confirmation → quick / standard / detailed recap generation and display, with the spoiler boundary and confidence always shown. Google Books integration, D1/Cloudflare, and a real AI provider are not yet implemented — see `docs/ROADMAP.md`.
 
 ## Technology stack
 
@@ -31,17 +31,18 @@ Open http://localhost:3000. No environment variables or credentials are required
 
 Copy `.env.example` to `.env.local` if you want to override defaults. All variables are optional for local/demo use:
 
-| Variable                                                                    | Purpose                                                     |
-| --------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `NEXT_PUBLIC_APP_MODE`                                                      | `development` / `production` mode indicator (non-secret).   |
-| `BOOK_SEARCH_PROVIDER`                                                      | `mock` (default) or `google`.                               |
-| `RECAP_PROVIDER`                                                            | `mock` (default); real providers are a future stage.        |
-| `LIBRARY_REPOSITORY`                                                        | `local` (default, browser storage); `d1` is a future stage. |
-| `STORY_SOURCE_REPOSITORY`                                                   | `synthetic` (default); `d1` is a future stage.              |
-| `GOOGLE_BOOKS_API_KEY`                                                      | Enables real book search if `BOOK_SEARCH_PROVIDER=google`.  |
-| `OPENAI_API_KEY` / `OPENAI_MODEL`                                           | Future real recap provider (not yet implemented).           |
-| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`                                     | Future real recap provider (not yet implemented).           |
-| `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_DATABASE_ID` / `CLOUDFLARE_R2_BUCKET` | Future Cloudflare deployment (not yet implemented).         |
+| Variable                                                                    | Purpose                                                                                                       |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_MODE`                                                      | `development` / `production` mode indicator (non-secret).                                                     |
+| `NEXT_PUBLIC_SITE_URL`                                                      | Public origin for resolving absolute URLs (e.g. the social share image); defaults to `http://localhost:3000`. |
+| `BOOK_SEARCH_PROVIDER`                                                      | `mock` (default) or `google`.                                                                                 |
+| `RECAP_PROVIDER`                                                            | `mock` (default); real providers are a future stage.                                                          |
+| `LIBRARY_REPOSITORY`                                                        | `local` (default, browser storage); `d1` is a future stage.                                                   |
+| `STORY_SOURCE_REPOSITORY`                                                   | `synthetic` (default); `d1` is a future stage.                                                                |
+| `GOOGLE_BOOKS_API_KEY`                                                      | Enables real book search if `BOOK_SEARCH_PROVIDER=google`.                                                    |
+| `OPENAI_API_KEY` / `OPENAI_MODEL`                                           | Future real recap provider (not yet implemented).                                                             |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`                                     | Future real recap provider (not yet implemented).                                                             |
+| `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_DATABASE_ID` / `CLOUDFLARE_R2_BUCKET` | Future Cloudflare deployment (not yet implemented).                                                           |
 
 Never commit `.env` or `.env.local`.
 
@@ -86,12 +87,12 @@ See `docs/DEPLOYMENT.md`.
 
 ## Known limitations
 
-- Search, add/remove-from-shelf UI, and Google Books integration are not yet built (the guest shelf currently only contains the seeded demo book).
+- Book search only queries a small set of in-repo mock catalogue fixtures, not a real book database. Google Books integration is not yet built.
 - No real AI recap provider exists yet — only the deterministic mock.
 - No D1/Cloudflare deployment artifacts exist yet.
 - A PWA manifest exists (`src/app/manifest.ts`), but there is no service worker yet, so offline behavior is whatever the browser caches by default.
-- Playwright e2e coverage exists for the current slice (landing, guest mode, demo recap flow, persistence, keyboard nav, mobile viewport) only, not the full 20-step flow in the build prompt.
-- The PWA icon is a single large source image rather than a generated, size-optimized icon set.
+- Playwright e2e coverage exists for the flows that ship today (landing, guest mode, search, add/remove, demo recap flow, persistence, keyboard nav, mobile viewport), not the full 20-step flow in the build prompt.
+- Reading status changes (want-to-read/reading/paused/finished) are not yet editable from the UI — new shelf items default to "want to read"; only progress entry currently advances status to "reading".
 
 ## Roadmap
 

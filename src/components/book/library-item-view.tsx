@@ -1,17 +1,22 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BookCover } from "@/components/book/book-cover";
 import { Badge } from "@/components/ui/badge";
+import { Button, LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LinkButton } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LibraryItem } from "@/domain/library/types";
+import { formatIsbnForDisplay } from "@/lib/isbn/isbn";
 import { formatReadingStatus } from "@/lib/formatting/reading-status";
 import { localLibraryRepository } from "@/repositories/library/local-library-repository";
 
 export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
+  const router = useRouter();
   const [item, setItem] = useState<LibraryItem | null | undefined>(undefined);
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,6 +54,18 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
   }
 
   const recapSupported = item.book.isSyntheticDemo;
+  const isbn = item.edition.isbn13 ?? item.edition.isbn10;
+
+  async function handleRemove() {
+    if (!item) return;
+    const confirmed = window.confirm(
+      `Remove "${item.book.title}" from your shelf? This only affects this device.`,
+    );
+    if (!confirmed) return;
+    setRemoving(true);
+    await localLibraryRepository.removeLibraryItem(item.id);
+    router.push("/app");
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -60,12 +77,7 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
       </Link>
 
       <div className="mt-4 flex flex-col gap-6 sm:flex-row">
-        <div
-          aria-hidden="true"
-          className="flex h-48 w-32 flex-shrink-0 items-center justify-center rounded-md border border-border bg-muted font-serif text-3xl text-muted-foreground shadow-sm"
-        >
-          {item.book.title.charAt(0)}
-        </div>
+        <BookCover title={item.book.title} coverUrl={item.book.coverUrl} />
 
         <div className="flex-1">
           <h1 className="font-serif text-3xl font-semibold text-foreground">
@@ -78,7 +90,7 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <Badge tone="neutral">{formatReadingStatus(item.status)}</Badge>
             {recapSupported ? (
-              <Badge tone="success">Recap available</Badge>
+              <Badge tone="brand">Recap available</Badge>
             ) : (
               <Badge tone="warning">Recap unavailable for this title</Badge>
             )}
@@ -101,6 +113,12 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
               <div>
                 <dt className="font-medium text-foreground">Language</dt>
                 <dd>{item.edition.language.toUpperCase()}</dd>
+              </div>
+            )}
+            {isbn && (
+              <div>
+                <dt className="font-medium text-foreground">ISBN</dt>
+                <dd>{formatIsbnForDisplay(isbn)}</dd>
               </div>
             )}
           </dl>
@@ -127,6 +145,9 @@ export function LibraryItemView({ libraryItemId }: { libraryItemId: string }) {
                 Resume with a recap
               </LinkButton>
             )}
+            <Button variant="ghost" onClick={handleRemove} disabled={removing}>
+              {removing ? "Removing…" : "Remove from shelf"}
+            </Button>
           </div>
 
           {item.progress?.mappedBoundaryLabel && (
