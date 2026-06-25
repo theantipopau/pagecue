@@ -104,13 +104,13 @@ describe("GeminiRecapProvider", () => {
     });
     vi.stubGlobal("fetch", fetchSpy);
 
-    const provider = new GeminiRecapProvider("test-key", "gemini-2.0-flash");
+    const provider = new GeminiRecapProvider("test-key", "gemini-2.5-flash");
     await provider.generateRecap(baseInput);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const [url, init] = fetchSpy.mock.calls[0];
     expect(url).toBe(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
     );
     expect(init.headers["x-goog-api-key"]).toBe("test-key");
     const body = JSON.parse(init.body);

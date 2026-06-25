@@ -49,6 +49,8 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - Graceful, logged fallback to the mock provider when `RECAP_PROVIDER=gemini` is set without `GEMINI_API_KEY`, matching the existing Google Books fallback pattern.
 - Defense in depth proven by test: Gemini's output is never trusted more than the mock provider's - a dedicated test feeds a fabricated Gemini response that cites a nonexistent segment through the real `validateRecap` and confirms it is still rejected (`UNKNOWN_SEGMENT`).
 - 9 new unit tests for `GeminiRecapProvider` (87 unit tests total across 7 files).
+- Verified live end-to-end with a real `GEMINI_API_KEY`: generated an actual chapter-4 recap through the running app, which passed validation and rendered correctly. Discovered the originally-chosen default model (`gemini-2.0-flash`) has a hard zero free-tier quota on at least one real project, while `gemini-2.5-flash` works - changed the default accordingly (see `docs/DECISIONS.md`).
+- `playwright.config.ts` now forces `BOOK_SEARCH_PROVIDER=mock` / `RECAP_PROVIDER=mock` for the e2e web server regardless of any real keys in `.env.local`, so e2e stays deterministic and never spends real API quota.
 
 ### Known limitations
 

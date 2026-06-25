@@ -25,7 +25,7 @@ const REQUEST_TIMEOUT_MS = 15_000;
 export class GeminiRecapProvider implements RecapProvider {
   constructor(
     private readonly apiKey: string,
-    private readonly model: string = "gemini-2.0-flash",
+    private readonly model: string = "gemini-2.5-flash",
   ) {}
 
   async generateRecap(input: GenerateRecapInput): Promise<Recap> {

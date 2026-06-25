@@ -126,3 +126,15 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Consequences:** Critically, Gemini's output is **not** trusted any more than the mock provider's - `generateValidatedRecap` runs every recap, from any provider, through the same deterministic `validateRecap`. A dedicated test (`gemini-recap-provider.test.ts`, "defense in depth") proves a Gemini response citing a nonexistent segment is still rejected. Like `GoogleBooksProvider`, `RECAP_PROVIDER=gemini` without `GEMINI_API_KEY` falls back to the mock provider with a logged warning rather than breaking the app.
 
 **Revisit trigger:** If Gemini's free tier terms change materially, or when Cloudflare Workers AI becomes available as an alternative free option once the D1/Cloudflare stage begins.
+
+---
+
+## 2026-06-25 — Default Gemini model changed to `gemini-2.5-flash` after a live free-tier quota test
+
+**Context:** The user supplied a real `GEMINI_API_KEY` for live testing. With that key, `gemini-2.0-flash` (the original default) returned HTTP 429 with `RESOURCE_EXHAUSTED` and `limit: 0` for `generate_content_free_tier_requests` - not a transient rate limit, but a hard zero free-tier quota for that specific model on this project. A direct `curl` test confirmed `gemini-1.5-flash` is deprecated (404) and `gemini-2.5-flash` works (HTTP 200) on the free tier for this project.
+
+**Choice:** Changed the `GeminiRecapProvider` constructor default and `.env.example`'s `GEMINI_MODEL` to `gemini-2.5-flash`. Verified end-to-end through the real app (not just a mocked unit test): generated an actual chapter-4 recap via the live API, which passed `validateRecap` and rendered correctly with the right spoiler boundary.
+
+**Consequences:** Free-tier model availability is per-project and apparently inconsistent across Gemini model versions (confirmed empirically, not documented anywhere obvious) - a model that works on one Google account/project may return a zero quota on another. `.env.example` and `README.md` now note this and point to Google's model list if a chosen model returns a quota error.
+
+**Revisit trigger:** If `gemini-2.5-flash`'s free tier is discontinued or quota changes; re-test with `curl` against the target model before changing the default again, since quota behavior isn't reliably documented.

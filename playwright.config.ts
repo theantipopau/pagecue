@@ -21,5 +21,8 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Force the zero-credential mock providers regardless of any real keys in .env.local -
+    // e2e must stay deterministic and must never spend real API quota or depend on network.
+    env: { BOOK_SEARCH_PROVIDER: "mock", RECAP_PROVIDER: "mock" },
   },
 });
