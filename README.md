@@ -8,7 +8,7 @@ See `docs/PRODUCT_SPEC.md` for the full product spec and `docs/SPOILER_SAFETY.md
 
 ## Current project status
 
-Core experience complete: landing page → guest mode → book search (mock or real Google Books) → add/remove from shelf and edit reading status → reading-progress boundary confirmation → quick / standard / detailed recap generation (mock or real Gemini) and display, with the spoiler boundary and confidence always shown. D1/Cloudflare deployment is not yet implemented — see `docs/ROADMAP.md`.
+Core experience complete: landing page → guest mode → book search (mock or real Google Books) → add/remove from shelf and edit reading status → reading-progress boundary confirmation → quick / standard / detailed recap generation (mock or real Gemini) and display, with the spoiler boundary and confidence always shown and saved to a per-book history. Settings (`/settings`) and About (`/about`) pages cover privacy, data reset, and product positioning. D1/Cloudflare deployment is not yet implemented — see `docs/ROADMAP.md`.
 
 ## Technology stack
 

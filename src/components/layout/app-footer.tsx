@@ -10,7 +10,7 @@ export function AppFooter() {
         </p>
         <p>
           Running in demonstration mode &mdash; guest data stays on this device.{" "}
-          <Link href="/" className="underline hover:text-foreground">
+          <Link href="/about" className="underline hover:text-foreground">
             Learn more
           </Link>
         </p>

@@ -112,6 +112,19 @@ describe("LocalRecapHistoryRepository", () => {
     expect(await repo.listHistory("item-2")).toHaveLength(1);
   });
 
+  it("clears history for every item via clearAllHistory", async () => {
+    const { LocalRecapHistoryRepository } =
+      await import("../local-recap-history-repository");
+    const repo = new LocalRecapHistoryRepository();
+    await repo.addHistoryEntry("item-1", sampleRecap);
+    await repo.addHistoryEntry("item-2", sampleRecap);
+
+    await repo.clearAllHistory();
+
+    expect(await repo.listHistory("item-1")).toHaveLength(0);
+    expect(await repo.listHistory("item-2")).toHaveLength(0);
+  });
+
   it("recovers from corrupt JSON instead of throwing", async () => {
     window.localStorage.setItem(RECAP_HISTORY_STORAGE_KEY, "{not valid json");
     const { LocalRecapHistoryRepository } =

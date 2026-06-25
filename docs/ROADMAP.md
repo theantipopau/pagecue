@@ -24,14 +24,15 @@ Tracked against the implementation sequence in the build prompt (§39) and the P
 - Connected the repository to its GitHub remote (`github.com/theantipopau/pagecue`) and pushed `main`.
 - Live-tested `GeminiRecapProvider` end-to-end with a real API key and switched the default model to `gemini-2.5-flash` after discovering `gemini-2.0-flash` has a hard zero free-tier quota on at least one real project (see `docs/DECISIONS.md`). Hardened `playwright.config.ts` to force mock providers for e2e regardless of real keys in `.env.local`.
 - Recap history: every successfully validated recap is saved per shelf item in `localStorage` (capped at 20 entries, versioned, schema-validated, corrupt-data recovery), with a "Previously generated" list on the recap setup screen offering "View" (redisplays the stored recap without a new API call) and "Clear history".
+- Settings page (`/settings`): theme toggle, a plain explanation of exactly what's stored locally and what would be sent to an external provider if configured, and a "Reset demo data" action that clears the shelf and all recap history back to just the seeded demo book.
+- About page (`/about`): product positioning (what PageCue is/isn't), a plain-language explanation of how the spoiler boundary and validator work, why recap support depends on real structured data, and a copyright/legal disclaimer per build prompt §38. Linked from the header nav and the footer's "Learn more".
 
 ## In progress / immediately next
 
-- Settings/About pages (theme, privacy explanation, demonstration-mode disclosure).
+- D1 migrations + `D1LibraryRepository` / `D1StorySourceRepository`, Cloudflare Workers/OpenNext deployment, Wrangler configuration. (Cloudflare Workers AI, also free-tier, is a candidate alternative/companion to Gemini once this stage begins - see `docs/DECISIONS.md`.)
 
 ## Planned
 
-- D1 migrations + `D1LibraryRepository` / `D1StorySourceRepository`, Cloudflare Workers/OpenNext deployment, Wrangler configuration. (Cloudflare Workers AI, also free-tier, is a candidate alternative/companion to Gemini once this stage begins - see `docs/DECISIONS.md`.)
 - `OpenAIRecapProvider`/`AnthropicRecapProvider` as alternative real recap providers behind the existing `RecapProvider` interface, if ever needed - not a priority given Gemini's free tier already covers the "real provider" need.
 - Service worker for offline app-shell/guest-shelf caching (manifest exists; service worker does not yet).
 
@@ -41,4 +42,4 @@ Accounts/auth, payments, social features, publisher dashboards, EPUB/PDF ingesti
 
 ## Completion criteria for "Phase 1 done"
 
-See build prompt §40 in full. Not yet satisfied: D1/Cloudflare, service worker, settings/about pages, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, book search (mock and real Google Books), shelf add/remove/status-editing, demo novel, boundary selection, three-tier recap generation (mock and real Gemini) with displayed boundary/confidence and saved history, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.
+See build prompt §40 in full. Not yet satisfied: D1/Cloudflare, service worker, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, book search (mock and real Google Books), shelf add/remove/status-editing, demo novel, boundary selection, three-tier recap generation (mock and real Gemini) with displayed boundary/confidence and saved history, settings/about pages, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.

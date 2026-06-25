@@ -59,9 +59,16 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - Extracted a shared `createId()` helper (`src/lib/create-id.ts`) used by both the library and recap-history repositories.
 - 7 new unit tests for `LocalRecapHistoryRepository` (94 unit tests total across 8 files) and 1 new Playwright test covering generate → view from history → clear (24 e2e runs total).
 
+### Added (settings and about pages)
+
+- `/settings` page: theme toggle, a plain-language explanation of exactly what PageCue stores locally and what would be sent to an external provider if one is configured, and a "Reset demo data" action (clears the shelf and all recap history back to just the seeded demo book).
+- `/about` page: product positioning (what PageCue is and isn't), a plain-language explanation of how the spoiler boundary and validator work, why recap support depends on real structured data rather than guessing from a title/author, and a copyright/legal disclaimer (build prompt §38).
+- Added `clearAllHistory()` to `RecapHistoryRepository`, used by the settings reset action so it doesn't leave orphaned history behind for a removed item.
+- Linked both pages from the header nav ("Settings") and the footer's "Learn more" (now points to `/about` instead of the homepage).
+- 1 new unit test for `clearAllHistory()` (95 unit tests total) and a new Playwright spec, `tests/e2e/settings-and-about.spec.ts`, covering both pages and the reset action (32 e2e runs total).
+
 ### Known limitations
 
 - Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
 - Without `GEMINI_API_KEY`, recap generation uses the deterministic mock provider rather than a real model.
 - No D1/Cloudflare deployment artifacts yet.
-- Settings/about pages are not yet implemented.

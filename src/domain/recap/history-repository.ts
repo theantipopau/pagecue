@@ -8,4 +8,5 @@ export interface RecapHistoryRepository {
     recap: Recap,
   ): Promise<RecapHistoryEntry>;
   clearHistory(libraryItemId: string): Promise<void>;
+  clearAllHistory(): Promise<void>;
 }

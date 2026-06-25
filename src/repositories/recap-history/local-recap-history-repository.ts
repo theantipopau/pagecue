@@ -86,6 +86,11 @@ export class LocalRecapHistoryRepository implements RecapHistoryRepository {
     delete history.entriesByLibraryItemId[libraryItemId];
     this.write(history);
   }
+
+  /** Used by the "reset demo data" settings action so it doesn't leave orphaned history behind. */
+  async clearAllHistory(): Promise<void> {
+    this.write(emptyHistory());
+  }
 }
 
 export const localRecapHistoryRepository = new LocalRecapHistoryRepository();

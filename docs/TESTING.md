@@ -38,12 +38,13 @@
 
 ## Playwright flows (build prompt §31.3 — staged)
 
-The full 20-step flow is the target once settings/about exist. Two specs currently cover the flows that exist:
+The full 20-step flow is the target once D1/Cloudflare lands. Three specs currently cover the flows that exist:
 
 - `tests/e2e/demo-recap-flow.spec.ts` — landing → guest mode → demo book → boundary confirmation → quick/standard/detailed recap → boundary display → shelf persistence across reload → keyboard reachability → generating a recap saves it to history, which can be viewed without a new API call or cleared.
 - `tests/e2e/search-and-shelf.spec.ts` — title/author/ISBN search, multi-edition warnings, an honest empty state, add-to-shelf, remove-from-shelf from both the shelf dashboard and the book detail page, and reading-status editing.
+- `tests/e2e/settings-and-about.spec.ts` — settings explains local-only storage and toggles theme, resetting demo data clears everything back to just the demo book, the about page explains spoiler safety and copyright, and header/footer navigation reaches both pages.
 
-24 e2e runs currently pass (both specs × desktop and mobile viewports), against the mock book search and recap providers - `playwright.config.ts` forces `BOOK_SEARCH_PROVIDER=mock`/`RECAP_PROVIDER=mock` for the e2e web server regardless of any real keys in `.env.local`, so e2e never spends real API quota. The real Google Books and Gemini integrations are exercised by unit tests with a mocked `fetch` instead. Remaining flows (settings/about) are tracked in `docs/ROADMAP.md` and added alongside the pages that make them meaningful (no point scripting a flow against a page that doesn't exist yet).
+32 e2e runs currently pass (all three specs × desktop and mobile viewports), against the mock book search and recap providers - `playwright.config.ts` forces `BOOK_SEARCH_PROVIDER=mock`/`RECAP_PROVIDER=mock` for the e2e web server regardless of any real keys in `.env.local`, so e2e never spends real API quota. The real Google Books and Gemini integrations are exercised by unit tests with a mocked `fetch` instead. The remaining gap to the full 20-step flow is D1/Cloudflare, tracked in `docs/ROADMAP.md`.
 
 ## Quality commands
 

@@ -33,6 +33,12 @@ export function AppHeader() {
           >
             My shelf
           </Link>
+          <Link
+            href="/settings"
+            className="rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            Settings
+          </Link>
           <ThemeToggle />
         </nav>
       </div>
