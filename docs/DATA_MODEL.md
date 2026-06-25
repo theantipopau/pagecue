@@ -46,9 +46,9 @@ Rules (`src/repositories/recap-history/local-recap-history-repository.ts`):
 - Each item's entry list is capped at `MAX_HISTORY_ENTRIES_PER_ITEM` (20), newest first, to keep the stored payload modest (build prompt §23).
 - Every read is parsed with Zod against the same `RecapSchema` used elsewhere; invalid/corrupt payloads fall back to an empty history rather than throwing.
 
-## D1 schema (target design, not yet migrated — see `docs/DECISIONS.md`)
+## D1 schema (migration written, not yet applied to a real database — see `docs/DECISIONS.md`)
 
-Tables mirror build prompt §24 exactly: `books`, `editions`, `profiles`, `library_items`, `source_documents`, `chapters`, `segments`, `story_snapshots`, `recaps`. Key design notes for when Stage 10 implements migrations:
+Tables mirror build prompt §24 exactly: `books`, `editions`, `profiles`, `library_items`, `source_documents`, `chapters`, `segments`, `story_snapshots`, `recaps`. The migration exists at `migrations/0001_initial_schema.sql` (CHECK constraints encode the same enums as the TypeScript domain types); it has not been applied to any database yet, and `D1LibraryRepository`/`D1StorySourceRepository` are not implemented yet either - see `docs/DEPLOYMENT.md` for the remaining account-specific steps. Key design notes:
 
 - All primary keys are stable, application-generated string IDs (not auto-increment), so the same ID scheme works identically in the in-memory synthetic repository and the D1 repository.
 - `segments.text_hash` is stored instead of segment text — D1 never holds raw commercial book text (build prompt §24, §38).

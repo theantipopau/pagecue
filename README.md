@@ -92,7 +92,7 @@ See `docs/DEPLOYMENT.md`.
 
 - Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
 - Without `GEMINI_API_KEY`, recap generation uses the deterministic mock provider rather than a real model.
-- No D1/Cloudflare deployment artifacts exist yet.
+- D1/Cloudflare groundwork exists (`wrangler.jsonc`, `migrations/0001_initial_schema.sql`, `npm run cf:*`/`db:migrate:*` scripts), but no real D1 database has been created yet and `D1LibraryRepository`/`D1StorySourceRepository` aren't implemented - see `docs/DEPLOYMENT.md`.
 - A PWA manifest exists (`src/app/manifest.ts`), but there is no service worker yet, so offline behavior is whatever the browser caches by default.
 - Playwright e2e coverage exists for the flows that ship today (landing, guest mode, search, add/remove, status editing, demo recap flow, persistence, keyboard nav, mobile viewport), not the full 20-step flow in the build prompt, and does not exercise the real Google Books or Gemini APIs (both covered by unit tests with a mocked `fetch` instead).
 

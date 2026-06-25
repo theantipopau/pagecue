@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pagecue",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-06-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      // Self-reference service binding required by the OpenNext Cloudflare adapter.
+      // See https://opennext.js.org/cloudflare/caching
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "pagecue",
+    },
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pagecue",
+      // Filled in by `wrangler d1 create pagecue` once the user is logged in - see
+      // docs/DEPLOYMENT.md. Left blank rather than guessed; wrangler will error clearly if
+      // a deploy is attempted before this is set.
+      "database_id": "",
+    },
+  ],
+  // R2 cache and image-optimization bindings are deferred until they're actually needed -
+  // see docs/DEPLOYMENT.md and https://opennext.js.org/cloudflare/caching.
+}

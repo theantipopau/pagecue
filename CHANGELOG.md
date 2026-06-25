@@ -67,8 +67,17 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - Linked both pages from the header nav ("Settings") and the footer's "Learn more" (now points to `/about` instead of the homepage).
 - 1 new unit test for `clearAllHistory()` (95 unit tests total) and a new Playwright spec, `tests/e2e/settings-and-about.spec.ts`, covering both pages and the reset action (32 e2e runs total).
 
+### Added (D1/Cloudflare groundwork)
+
+- Installed `wrangler` and `@opennextjs/cloudflare`. Scaffolded `wrangler.jsonc` and `open-next.config.ts` from the adapter's official template (D1 binding included, R2 cache/image-optimization bindings deliberately deferred until they have a real consumer).
+- Wrote `migrations/0001_initial_schema.sql`: the full D1 schema from build prompt §24 (`books`, `editions`, `profiles`, `library_items`, `source_documents`, `chapters`, `segments`, `story_snapshots`, `recaps`), with foreign keys, indexes, and CHECK constraints mirroring the existing TypeScript domain enums.
+- Added `cf:build` / `cf:preview` / `cf:deploy` / `db:migrate:local` / `db:migrate:remote` npm scripts and `.dev.vars.example` (wrangler's local-secrets file, distinct from `.env.local`).
+- `wrangler.jsonc`'s `database_id` is deliberately left blank - creating the real D1 database requires `wrangler login`, an interactive browser auth flow that has to be done by the Cloudflare account owner, not in this session.
+- Deliberately did **not** wire `initOpenNextCloudflareForDev()` into `next.config.ts` yet: doing so against a blank `database_id` could break the default zero-credential `npm run dev` for everyone (build prompt §4.4 is non-negotiable). Verified `npm run dev`/`build` are unaffected by the new Cloudflare files in this session.
+
 ### Known limitations
 
 - Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
 - Without `GEMINI_API_KEY`, recap generation uses the deterministic mock provider rather than a real model.
-- No D1/Cloudflare deployment artifacts yet.
+- No D1 database exists yet - the migration is written but unapplied, and `D1LibraryRepository`/`D1StorySourceRepository` are not implemented. `LIBRARY_REPOSITORY`/`STORY_SOURCE_REPOSITORY` only support `local`/`synthetic` today.
+- No actual Cloudflare deploy has happened yet.

@@ -1,0 +1,13 @@
+# Copy to .dev.vars for `wrangler dev` / `npm run cf:preview` (testing the actual Worker build
+# locally, as opposed to `npm run dev` which uses .env.local). Wrangler reads this file, not
+# .env.local. Same variables as .env.example - see that file for what each one does.
+
+NEXT_PUBLIC_APP_MODE=development
+BOOK_SEARCH_PROVIDER=mock
+RECAP_PROVIDER=mock
+LIBRARY_REPOSITORY=local
+STORY_SOURCE_REPOSITORY=synthetic
+
+GOOGLE_BOOKS_API_KEY=
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash

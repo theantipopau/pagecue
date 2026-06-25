@@ -27,9 +27,12 @@ Tracked against the implementation sequence in the build prompt (§39) and the P
 - Settings page (`/settings`): theme toggle, a plain explanation of exactly what's stored locally and what would be sent to an external provider if configured, and a "Reset demo data" action that clears the shelf and all recap history back to just the seeded demo book.
 - About page (`/about`): product positioning (what PageCue is/isn't), a plain-language explanation of how the spoiler boundary and validator work, why recap support depends on real structured data, and a copyright/legal disclaimer per build prompt §38. Linked from the header nav and the footer's "Learn more".
 
+- D1/Cloudflare groundwork: `wrangler` + `@opennextjs/cloudflare` installed, `wrangler.jsonc` and `open-next.config.ts` scaffolded from the adapter's official template, `migrations/0001_initial_schema.sql` written (full schema from build prompt §24), `cf:build`/`cf:preview`/`cf:deploy`/`db:migrate:local`/`db:migrate:remote` npm scripts added, `.dev.vars.example` added.
+
 ## In progress / immediately next
 
-- D1 migrations + `D1LibraryRepository` / `D1StorySourceRepository`, Cloudflare Workers/OpenNext deployment, Wrangler configuration. (Cloudflare Workers AI, also free-tier, is a candidate alternative/companion to Gemini once this stage begins - see `docs/DECISIONS.md`.)
+- Waiting on the account owner to run `wrangler login` + `wrangler d1 create pagecue`, then fill in `database_id` in `wrangler.jsonc` and apply the migration (see `docs/DEPLOYMENT.md`).
+- `D1LibraryRepository` / `D1StorySourceRepository` implementations, once a real D1 database exists. (Cloudflare Workers AI, also free-tier, is a candidate alternative/companion to Gemini once this stage is further along - see `docs/DECISIONS.md`.)
 
 ## Planned
 

@@ -138,3 +138,15 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Consequences:** Free-tier model availability is per-project and apparently inconsistent across Gemini model versions (confirmed empirically, not documented anywhere obvious) - a model that works on one Google account/project may return a zero quota on another. `.env.example` and `README.md` now note this and point to Google's model list if a chosen model returns a quota error.
 
 **Revisit trigger:** If `gemini-2.5-flash`'s free tier is discontinued or quota changes; re-test with `curl` against the target model before changing the default again, since quota behavior isn't reliably documented.
+
+---
+
+## 2026-06-25 — D1/Cloudflare groundwork laid before account access exists
+
+**Context:** Stage 10 (D1/Cloudflare) needs a real Cloudflare account: `wrangler login` opens a browser auth flow that cannot be done on the user's behalf, and creating a D1 database needs an authenticated session. The user chose to log in themselves and asked for everything else prepared first.
+
+**Choice:** Installed `wrangler` and `@opennextjs/cloudflare`, wrote `migrations/0001_initial_schema.sql` (the full schema from build prompt §24 / `docs/DATA_MODEL.md`, as CREATE TABLE statements with CHECK constraints mirroring the TypeScript enums), and scaffolded `wrangler.jsonc` (using the adapter's own official template, in JSONC rather than TOML since that's what the template ships) with a D1 binding whose `database_id` is deliberately left blank rather than guessed. Added `cf:build`/`cf:preview`/`cf:deploy`/`db:migrate:local`/`db:migrate:remote` npm scripts and a `.dev.vars.example` (wrangler's local-secrets file, distinct from `.env.local`). Deferred R2 cache and image-optimization bindings - the official template includes them, but neither has a consumer yet in this app, so they were left out rather than wired up speculatively.
+
+**Consequences:** `initOpenNextCloudflareForDev()` was deliberately **not** added to `next.config.ts` yet - wiring it in against a `wrangler.jsonc` with a blank `database_id` could break plain `npm run dev` for everyone, which must keep working with zero credentials per build prompt §4.4. It should be added once a real `database_id` exists, with `npm run dev` re-verified immediately after.
+
+**Revisit trigger:** Once the user has run `wrangler login` + `wrangler d1 create pagecue`: fill in `database_id`, run `npm run db:migrate:local`, add `initOpenNextCloudflareForDev()` to `next.config.ts` and verify `npm run dev` still starts cleanly, then implement `D1LibraryRepository`/`D1StorySourceRepository`.
