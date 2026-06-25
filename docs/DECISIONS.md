@@ -108,3 +108,21 @@ Lightweight ADR-style record of decisions that are expensive or difficult to rev
 **Consequences:** GitHub's contributor graph and commit list will show only the user as author. This instruction is repository-specific context for future sessions: do not add `Co-Authored-By: Claude` trailers to commits in this repository.
 
 **Revisit trigger:** None expected; flag to the user if they ever ask to restore co-author attribution.
+
+---
+
+## 2026-06-25 — Real recap provider: Google Gemini, not OpenAI/Anthropic, because it must stay free to run
+
+**Context:** The build prompt's suggested stack (§9, §11) names `OPENAI_API_KEY`/`ANTHROPIC_API_KEY` as the example real recap provider. Implementing the real provider was the next roadmap item, and the user explicitly added a new product requirement at this point: PageCue "will need to be a free product too - so use free APIs where possible." OpenAI and Anthropic have no ongoing free tier (trial credit only, then pay-per-token); Google's Gemini API has a genuinely free tier (no payment method required) that's generous enough for a low-traffic recap feature.
+
+**Options considered:**
+
+- Implement `OpenAIRecapProvider`/`AnthropicRecapProvider` as the build prompt's example suggests - rejected, since both would make every recap generation cost money once free trial credit runs out, conflicting with the new "free to run" requirement.
+- Implement Cloudflare Workers AI - has a free daily allocation and would align with the already-planned Cloudflare deployment, but requires Cloudflare account credentials/bindings that don't exist yet (D1/Cloudflare integration hasn't started). Revisit once that stage begins.
+- Implement a `GeminiRecapProvider` against Google's Gemini API - has a real, no-credit-card free tier today, requires only an API key (no infrastructure), and keeps the project in the same "Google" ecosystem already used for `GoogleBooksProvider`.
+
+**Choice:** Built `GeminiRecapProvider` (`src/providers/recap/gemini-recap-provider.ts`) as the first real `RecapProvider` implementation, selected via `RECAP_PROVIDER=gemini` + `GEMINI_API_KEY`. It sends the existing `RECAP_SYSTEM_INSTRUCTION`, the structured snapshot, and the allowed segment IDs via Gemini's REST API (no SDK dependency, keeping it Workers-compatible), using `generationConfig.responseSchema` to constrain JSON output for reliability. Added `gemini` to the `RECAP_PROVIDER` enum alongside the still-unimplemented `openai`/`anthropic` placeholders, rather than replacing them, in case a user of this codebase later wants one of those instead.
+
+**Consequences:** Critically, Gemini's output is **not** trusted any more than the mock provider's - `generateValidatedRecap` runs every recap, from any provider, through the same deterministic `validateRecap`. A dedicated test (`gemini-recap-provider.test.ts`, "defense in depth") proves a Gemini response citing a nonexistent segment is still rejected. Like `GoogleBooksProvider`, `RECAP_PROVIDER=gemini` without `GEMINI_API_KEY` falls back to the mock provider with a logged warning rather than breaking the app.
+
+**Revisit trigger:** If Gemini's free tier terms change materially, or when Cloudflare Workers AI becomes available as an alternative free option once the D1/Cloudflare stage begins.

@@ -5,6 +5,7 @@ import type { StorySourceRepository } from "@/domain/story/repository";
 import { demoSegments } from "@/data/demo/segments";
 import { GoogleBooksProvider } from "@/providers/book-search/google-books-provider";
 import { MockBookSearchProvider } from "@/providers/book-search/mock-book-search-provider";
+import { GeminiRecapProvider } from "@/providers/recap/gemini-recap-provider";
 import { MockRecapProvider } from "@/providers/recap/mock-recap-provider";
 import { SyntheticStorySourceRepository } from "@/repositories/story-source/synthetic-story-source-repository";
 import { appEnv } from "./env";
@@ -45,10 +46,23 @@ export function getRecapProvider(): RecapProvider {
   switch (appEnv.RECAP_PROVIDER) {
     case "mock":
       return new MockRecapProvider();
+    case "gemini": {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        // Same fallback philosophy as getBookSearchProvider(): never let a configured-but-
+        // unconfigured provider break the app. PageCue must stay free and credential-free by
+        // default (build prompt §4.4) even when an optional real provider is requested.
+        console.warn(
+          "RECAP_PROVIDER=gemini but GEMINI_API_KEY is not set; falling back to the mock recap provider.",
+        );
+        return new MockRecapProvider();
+      }
+      return new GeminiRecapProvider(apiKey, process.env.GEMINI_MODEL);
+    }
     case "openai":
     case "anthropic":
       throw new Error(
-        `RECAP_PROVIDER=${appEnv.RECAP_PROVIDER} is not implemented yet (see docs/ROADMAP.md). Use 'mock'.`,
+        `RECAP_PROVIDER=${appEnv.RECAP_PROVIDER} is not implemented yet (see docs/ROADMAP.md). Use 'mock' or 'gemini'.`,
       );
   }
 }

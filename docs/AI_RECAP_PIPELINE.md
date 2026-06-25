@@ -34,7 +34,9 @@ A `StorySnapshot` is the cumulative, reader-safe state of the story _as of_ a gi
 - The list of allowed segment IDs (≤ boundary)
 - Output schema instructions
 
-It never receives later snapshots, the full book, or a request to "recall" the book from general knowledge. `MockRecapProvider` (Phase 1 default) looks up a pre-authored response keyed by `(sourceDocumentId, boundaryOrdinal, detailLevel)` from `src/data/demo/mock-recaps.ts` — fully deterministic, no network call. A real provider (Stage 11) sits behind the identical interface and is given the system instruction in build prompt §19 verbatim, with low-variance sampling, a bounded timeout, and no provider-side storage where supported.
+It never receives later snapshots, the full book, or a request to "recall" the book from general knowledge. `MockRecapProvider` (default) looks up a pre-authored response keyed by `(sourceDocumentId, boundaryOrdinal, detailLevel)` from `src/data/demo/mock-recaps.ts` — fully deterministic, no network call.
+
+`GeminiRecapProvider` (`src/providers/recap/gemini-recap-provider.ts`) is the first real provider, selected via `RECAP_PROVIDER=gemini` + `GEMINI_API_KEY` (chosen over OpenAI/Anthropic specifically because it has a free usage tier — see `docs/DECISIONS.md`). It sends `RECAP_SYSTEM_INSTRUCTION` (below) as Gemini's `systemInstruction`, the structured payload from `buildGeminiUserContent` as the user turn, and a `generationConfig.responseSchema` mirroring `RecapSchema` to constrain JSON output — with low-variance sampling (`temperature: 0.2`), a bounded 15-second timeout with no retry loop, and no provider-side storage of the request. `OpenAIRecapProvider`/`AnthropicRecapProvider` remain unimplemented placeholders behind the same `RecapProvider` interface for whoever wants a different vendor.
 
 ## Structured output
 

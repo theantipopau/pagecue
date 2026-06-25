@@ -29,7 +29,7 @@ The single highest-risk failure mode is a recap that _sounds_ plausible but enco
 
 ## Prompt-level controls
 
-The system instruction (build prompt §19, `src/providers/recap/system-prompt.ts` once a real provider exists) explicitly prohibits outside knowledge, foreshadowing, speculation, invented motives/events, direct quotation, and requires schema-only output with citations. This is a _defense in depth_ layer, not the primary control — see validation below.
+The system instruction (build prompt §19, `RECAP_SYSTEM_INSTRUCTION` in `src/domain/recap/prompt-version.ts`, sent by `GeminiRecapProvider`) explicitly prohibits outside knowledge, foreshadowing, speculation, invented motives/events, direct quotation, and requires schema-only output with citations. This is a _defense in depth_ layer, not the primary control — see validation below.
 
 ## Retrieval controls
 
@@ -61,6 +61,6 @@ If a validation failure occurs in production, the API logs only `{ reason, sourc
 
 ## Known limitations
 
-- Phase 1's "model" is a deterministic lookup, not a live LLM, so the system-prompt controls are documented but not yet exercised against real model variance. They will be exercised once Stage 11 adds a real provider, reusing the exact same validator.
-- The validator checks structural safety (segment provenance), not stylistic leakage (e.g., a name's tone implying a twist). This is an acknowledged residual risk to revisit if real provider output is added.
+- `GeminiRecapProvider` is now a real, live LLM behind the same interface as the mock provider, and its output passes through the identical `validateRecap` - see the "defense in depth" test in `src/providers/recap/__tests__/gemini-recap-provider.test.ts`, which proves a fabricated Gemini response citing a nonexistent segment is still rejected. The system-prompt controls in `RECAP_SYSTEM_INSTRUCTION` are exercised against real model variance for the first time via this provider, though only at whatever traffic volume this deployment actually sees - they have not been adversarially red-teamed against a live model at scale.
+- The validator checks structural safety (segment provenance), not stylistic leakage (e.g., a name's tone implying a twist). This is an acknowledged residual risk that now applies to real model output (previously only a theoretical concern with the mock provider).
 - HTML/markup detection is pattern-based, not a full sanitizer; output is also never rendered as HTML, which is the primary control.

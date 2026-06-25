@@ -20,6 +20,8 @@ Tracked against the implementation sequence in the build prompt (§39) and the P
 - Playwright e2e coverage (desktop + mobile viewports) for the landing page, the full guest-mode recap flow, shelf persistence across reload, keyboard reachability, search, ISBN search, multi-edition warnings, add/remove-from-shelf, and reading-status editing (22 e2e runs total) - scoped to the flows that exist today, not yet the full 20-step flow in build prompt §31.3.
 - Server-side `GoogleBooksProvider`: normalizes Google's response into PageCue's own book/edition shape, dedupes repeated volumes, flags multi-edition works, handles missing covers/descriptions/page counts/ISBNs, applies a bounded request timeout with no retry loop, and falls back to the mock provider with a logged warning if `BOOK_SEARCH_PROVIDER=google` is set without `GOOGLE_BOOKS_API_KEY`.
 - Editable reading status (want to read / reading / paused / finished) directly from the book detail page.
+- Real AI recap provider: `GeminiRecapProvider` against Google's Gemini API, chosen specifically for its free usage tier so PageCue can stay free to run (see `docs/DECISIONS.md`). Same bounded-timeout/no-retry/graceful-fallback-to-mock pattern as `GoogleBooksProvider`. Its output is never trusted more than the mock provider's - it passes through the identical `validateRecap`, proven by a dedicated "defense in depth" test.
+- Connected the repository to its GitHub remote (`github.com/theantipopau/pagecue`) and pushed `main`.
 
 ## In progress / immediately next
 
@@ -28,8 +30,8 @@ Tracked against the implementation sequence in the build prompt (§39) and the P
 
 ## Planned
 
-- D1 migrations + `D1LibraryRepository` / `D1StorySourceRepository`, Cloudflare Workers/OpenNext deployment, Wrangler configuration.
-- Real AI recap provider (OpenAI or Anthropic) behind the existing `RecapProvider` interface, reusing the same validator.
+- D1 migrations + `D1LibraryRepository` / `D1StorySourceRepository`, Cloudflare Workers/OpenNext deployment, Wrangler configuration. (Cloudflare Workers AI, also free-tier, is a candidate alternative/companion to Gemini once this stage begins - see `docs/DECISIONS.md`.)
+- `OpenAIRecapProvider`/`AnthropicRecapProvider` as alternative real recap providers behind the existing `RecapProvider` interface, if ever needed - not a priority given Gemini's free tier already covers the "real provider" need.
 - Service worker for offline app-shell/guest-shelf caching (manifest exists; service worker does not yet).
 
 ## Deferred (explicitly out of scope until a later phase)
@@ -38,4 +40,4 @@ Accounts/auth, payments, social features, publisher dashboards, EPUB/PDF ingesti
 
 ## Completion criteria for "Phase 1 done"
 
-See build prompt §40 in full. Not yet satisfied: D1/Cloudflare, service worker, recap history, settings/about pages, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, book search (mock and real Google Books), shelf add/remove/status-editing, demo novel, boundary selection, three-tier recap generation with displayed boundary/confidence, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.
+See build prompt §40 in full. Not yet satisfied: D1/Cloudflare, service worker, recap history, settings/about pages, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, book search (mock and real Google Books), shelf add/remove/status-editing, demo novel, boundary selection, three-tier recap generation (mock and real Gemini) with displayed boundary/confidence, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.

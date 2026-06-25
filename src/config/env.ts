@@ -5,7 +5,9 @@ const EnvSchema = z.object({
     .enum(["development", "production"])
     .default("development"),
   BOOK_SEARCH_PROVIDER: z.enum(["mock", "google"]).default("mock"),
-  RECAP_PROVIDER: z.enum(["mock", "openai", "anthropic"]).default("mock"),
+  RECAP_PROVIDER: z
+    .enum(["mock", "gemini", "openai", "anthropic"])
+    .default("mock"),
   LIBRARY_REPOSITORY: z.enum(["local", "d1"]).default("local"),
   STORY_SOURCE_REPOSITORY: z.enum(["synthetic", "d1"]).default("synthetic"),
 });

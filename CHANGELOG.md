@@ -42,9 +42,17 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - One new Playwright test covering reading-status editing and its persistence across reload (22 e2e runs total).
 - Connected the repository to its GitHub remote (`github.com/theantipopau/pagecue`) and pushed `main`.
 
+### Added (real AI recap provider via Gemini's free tier)
+
+- `GeminiRecapProvider` (`src/providers/recap/gemini-recap-provider.ts`): the first real `RecapProvider` implementation, selected via `RECAP_PROVIDER=gemini` + `GEMINI_API_KEY`. Chosen over OpenAI/Anthropic specifically because Gemini has a genuine free usage tier - PageCue is meant to stay free to run, not just free to develop against (see `docs/DECISIONS.md`).
+- Sends the existing `RECAP_SYSTEM_INSTRUCTION`, the structured snapshot, and the allowed segment IDs to Gemini's REST API (no SDK dependency), using `generationConfig.responseSchema` to constrain JSON output, `temperature: 0.2` for low variance, a bounded 15-second timeout with no retry loop, and explicit handling for rate limits, non-OK statuses, error envelopes, blocked/empty output, and invalid JSON.
+- Graceful, logged fallback to the mock provider when `RECAP_PROVIDER=gemini` is set without `GEMINI_API_KEY`, matching the existing Google Books fallback pattern.
+- Defense in depth proven by test: Gemini's output is never trusted more than the mock provider's - a dedicated test feeds a fabricated Gemini response that cites a nonexistent segment through the real `validateRecap` and confirms it is still rejected (`UNKNOWN_SEGMENT`).
+- 9 new unit tests for `GeminiRecapProvider` (87 unit tests total across 7 files).
+
 ### Known limitations
 
 - Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
-- No real AI recap provider yet - only the deterministic mock (by design for this phase).
+- Without `GEMINI_API_KEY`, recap generation uses the deterministic mock provider rather than a real model.
 - No D1/Cloudflare deployment artifacts yet.
 - Recap history and settings/about pages are not yet implemented.
