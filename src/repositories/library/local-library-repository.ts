@@ -6,6 +6,7 @@ import type {
   LibraryItem,
   UpdateLibraryItemInput,
 } from "@/domain/library/types";
+import { createId } from "@/lib/create-id";
 import {
   SHELF_STORAGE_KEY,
   StoredShelfV1Schema,
@@ -21,12 +22,6 @@ export class LibraryItemNotFoundError extends Error {
 
 function nowIso(): string {
   return new Date().toISOString();
-}
-
-function createId(): string {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 function seedShelf(): StoredShelfV1 {

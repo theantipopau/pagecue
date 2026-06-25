@@ -29,6 +29,23 @@ Rules (`src/repositories/library/local-library-repository.ts`):
 - Writes are validated before being serialized.
 - A schema version field allows a future migration function to upgrade `v1 → v2` without losing data.
 
+## Local recap history storage shape
+
+Stored under its own versioned `localStorage` key (`pagecue.recapHistory.v1`), separate from the shelf:
+
+```ts
+interface StoredRecapHistoryV1 {
+  version: 1;
+  entriesByLibraryItemId: Record<string, RecapHistoryEntry[]>;
+}
+```
+
+Rules (`src/repositories/recap-history/local-recap-history-repository.ts`):
+
+- Only ever populated from a recap that has already passed `validateRecap` (`RecapFlow` writes to history right after a successful `POST /api/recap`), so reading history back does not re-validate.
+- Each item's entry list is capped at `MAX_HISTORY_ENTRIES_PER_ITEM` (20), newest first, to keep the stored payload modest (build prompt §23).
+- Every read is parsed with Zod against the same `RecapSchema` used elsewhere; invalid/corrupt payloads fall back to an empty history rather than throwing.
+
 ## D1 schema (target design, not yet migrated — see `docs/DECISIONS.md`)
 
 Tables mirror build prompt §24 exactly: `books`, `editions`, `profiles`, `library_items`, `source_documents`, `chapters`, `segments`, `story_snapshots`, `recaps`. Key design notes for when Stage 10 implements migrations:

@@ -52,9 +52,16 @@ All notable changes to PageCue are recorded here. Format loosely follows [Keep a
 - Verified live end-to-end with a real `GEMINI_API_KEY`: generated an actual chapter-4 recap through the running app, which passed validation and rendered correctly. Discovered the originally-chosen default model (`gemini-2.0-flash`) has a hard zero free-tier quota on at least one real project, while `gemini-2.5-flash` works - changed the default accordingly (see `docs/DECISIONS.md`).
 - `playwright.config.ts` now forces `BOOK_SEARCH_PROVIDER=mock` / `RECAP_PROVIDER=mock` for the e2e web server regardless of any real keys in `.env.local`, so e2e stays deterministic and never spends real API quota.
 
+### Added (recap history)
+
+- Every successfully validated recap is now saved to a local, per-shelf-item history (`LocalRecapHistoryRepository`, versioned `localStorage`, schema-validated using the existing `RecapSchema`, corrupt-data recovery, capped at 20 entries per item to keep the payload modest).
+- A "Previously generated" section appears on the recap setup screen once history exists, showing detail level, boundary label, and timestamp per entry, with "View" (redisplays the stored recap instantly, no API call or re-validation since it was only ever populated from already-validated recaps) and "Clear history".
+- Extracted a shared `createId()` helper (`src/lib/create-id.ts`) used by both the library and recap-history repositories.
+- 7 new unit tests for `LocalRecapHistoryRepository` (94 unit tests total across 8 files) and 1 new Playwright test covering generate → view from history → clear (24 e2e runs total).
+
 ### Known limitations
 
 - Without `GOOGLE_BOOKS_API_KEY`, book search only queries a small set of in-repo mock catalogue fixtures, not a real book database.
 - Without `GEMINI_API_KEY`, recap generation uses the deterministic mock provider rather than a real model.
 - No D1/Cloudflare deployment artifacts yet.
-- Recap history and settings/about pages are not yet implemented.
+- Settings/about pages are not yet implemented.

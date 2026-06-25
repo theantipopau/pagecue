@@ -22,10 +22,11 @@ Tracked against the implementation sequence in the build prompt (§39) and the P
 - Editable reading status (want to read / reading / paused / finished) directly from the book detail page.
 - Real AI recap provider: `GeminiRecapProvider` against Google's Gemini API, chosen specifically for its free usage tier so PageCue can stay free to run (see `docs/DECISIONS.md`). Same bounded-timeout/no-retry/graceful-fallback-to-mock pattern as `GoogleBooksProvider`. Its output is never trusted more than the mock provider's - it passes through the identical `validateRecap`, proven by a dedicated "defense in depth" test.
 - Connected the repository to its GitHub remote (`github.com/theantipopau/pagecue`) and pushed `main`.
+- Live-tested `GeminiRecapProvider` end-to-end with a real API key and switched the default model to `gemini-2.5-flash` after discovering `gemini-2.0-flash` has a hard zero free-tier quota on at least one real project (see `docs/DECISIONS.md`). Hardened `playwright.config.ts` to force mock providers for e2e regardless of real keys in `.env.local`.
+- Recap history: every successfully validated recap is saved per shelf item in `localStorage` (capped at 20 entries, versioned, schema-validated, corrupt-data recovery), with a "Previously generated" list on the recap setup screen offering "View" (redisplays the stored recap without a new API call) and "Clear history".
 
 ## In progress / immediately next
 
-- Recap history view for the demo book.
 - Settings/About pages (theme, privacy explanation, demonstration-mode disclosure).
 
 ## Planned
@@ -40,4 +41,4 @@ Accounts/auth, payments, social features, publisher dashboards, EPUB/PDF ingesti
 
 ## Completion criteria for "Phase 1 done"
 
-See build prompt §40 in full. Not yet satisfied: D1/Cloudflare, service worker, recap history, settings/about pages, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, book search (mock and real Google Books), shelf add/remove/status-editing, demo novel, boundary selection, three-tier recap generation (mock and real Gemini) with displayed boundary/confidence, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.
+See build prompt §40 in full. Not yet satisfied: D1/Cloudflare, service worker, settings/about pages, the full 20-step Playwright flow. Satisfied so far: local-credential-free run, landing page, guest mode, book search (mock and real Google Books), shelf add/remove/status-editing, demo novel, boundary selection, three-tier recap generation (mock and real Gemini) with displayed boundary/confidence and saved history, unit- and e2e-tested spoiler rejection, light/dark themes with brand-accurate colors, passing lint/typecheck/unit-test/e2e-test/build for the code that exists.

@@ -67,6 +67,41 @@ test.describe("PageCue demo recap flow", () => {
     await expect(page).toHaveURL(/\/app$/);
   });
 
+  test("generated recaps are saved to history and can be viewed or cleared", async ({
+    page,
+  }) => {
+    await page.goto("/app");
+    await page.getByRole("link", { name: "Open" }).first().click();
+    await page.getByRole("link", { name: "Set your progress" }).click();
+    await page.getByLabel("Chapter number").fill("2");
+    await page.getByRole("button", { name: "Save progress" }).click();
+    await page.getByRole("link", { name: "Resume with a recap" }).click();
+
+    await page.getByRole("radio", { name: "Quick" }).check();
+    await page.getByRole("button", { name: "Generate recap" }).click();
+    await expect(
+      page.getByRole("heading", { name: "The story so far" }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    await page.getByRole("button", { name: "Change recap length" }).click();
+    const historySection = page.locator("section", {
+      has: page.getByRole("heading", { name: "Previously generated" }),
+    });
+    await expect(historySection).toBeVisible();
+    await expect(historySection.getByText("Quick")).toBeVisible();
+
+    await historySection.getByRole("button", { name: "View" }).click();
+    await expect(
+      page.getByRole("heading", { name: "The story so far" }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Change recap length" }).click();
+    await historySection.getByRole("button", { name: "Clear history" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Previously generated" }),
+    ).toHaveCount(0);
+  });
+
   test("guest shelf persists across a reload", async ({ page }) => {
     await page.goto("/app");
     await expect(page.getByRole("heading", { name: "My shelf" })).toBeVisible();

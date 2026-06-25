@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LibraryItem } from "@/domain/library/types";
+import type { RecapHistoryEntry } from "@/domain/recap/history";
 import type { Recap, RecapDetailLevel } from "@/domain/recap/schema";
 import { localLibraryRepository } from "@/repositories/library/local-library-repository";
+import { localRecapHistoryRepository } from "@/repositories/recap-history/local-recap-history-repository";
 import { RecapResult } from "./recap-result";
 
 const DETAIL_LEVEL_OPTIONS: Array<{
@@ -31,6 +34,12 @@ const DETAIL_LEVEL_OPTIONS: Array<{
   },
 ];
 
+const DETAIL_LEVEL_LABELS: Record<RecapDetailLevel, string> = {
+  quick: "Quick",
+  standard: "Standard",
+  detailed: "Detailed",
+};
+
 type RecapApiResponse =
   | { status: "ok"; recap: Recap }
   | {
@@ -40,6 +49,13 @@ type RecapApiResponse =
   | { status: "validation_failed"; reason: string; message: string }
   | { status: "invalid_request" | "rate_limited"; message: string };
 
+function formatHistoryDate(iso: string): string {
+  return new Date(iso).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
 export function RecapFlow({ libraryItemId }: { libraryItemId: string }) {
   const [item, setItem] = useState<LibraryItem | null | undefined>(undefined);
   const [detailLevel, setDetailLevel] = useState<RecapDetailLevel>("standard");
@@ -48,11 +64,15 @@ export function RecapFlow({ libraryItemId }: { libraryItemId: string }) {
   >("setup");
   const [recap, setRecap] = useState<Recap | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [history, setHistory] = useState<RecapHistoryEntry[]>([]);
 
   useEffect(() => {
     let isMounted = true;
     localLibraryRepository.getLibraryItem(libraryItemId).then((result) => {
       if (isMounted) setItem(result);
+    });
+    localRecapHistoryRepository.listHistory(libraryItemId).then((entries) => {
+      if (isMounted) setHistory(entries);
     });
     return () => {
       isMounted = false;
@@ -149,6 +169,11 @@ export function RecapFlow({ libraryItemId }: { libraryItemId: string }) {
       if (data.status === "ok") {
         setRecap(data.recap);
         setPhase("result");
+        const entry = await localRecapHistoryRepository.addHistoryEntry(
+          item!.id,
+          data.recap,
+        );
+        setHistory((prev) => [entry, ...prev]);
       } else {
         setErrorMessage(data.message);
         setPhase("error");
@@ -157,6 +182,16 @@ export function RecapFlow({ libraryItemId }: { libraryItemId: string }) {
       setErrorMessage("We couldn't reach the recap service. Please try again.");
       setPhase("error");
     }
+  }
+
+  function handleViewHistoryEntry(entry: RecapHistoryEntry) {
+    setRecap(entry.recap);
+    setPhase("result");
+  }
+
+  async function handleClearHistory() {
+    await localRecapHistoryRepository.clearHistory(item!.id);
+    setHistory([]);
   }
 
   if (phase === "result" && recap) {
@@ -230,9 +265,9 @@ export function RecapFlow({ libraryItemId }: { libraryItemId: string }) {
       )}
 
       <p className="mt-6 text-xs text-muted-foreground">
-        This recap only uses information through {boundaryLabel}. It uses a
-        deterministic demonstration provider in this preview, not a live AI
-        model, and every recap is validated before it can be shown to you.
+        This recap only uses information through {boundaryLabel}, and every
+        recap is validated before it can be shown to you, regardless of how it
+        was generated.
       </p>
 
       <div className="mt-4 flex gap-3">
@@ -243,6 +278,55 @@ export function RecapFlow({ libraryItemId }: { libraryItemId: string }) {
           Cancel
         </LinkButton>
       </div>
+
+      {history.length > 0 && (
+        <section
+          className="mt-10 border-t border-border pt-6"
+          aria-labelledby="history-heading"
+        >
+          <div className="flex items-center justify-between">
+            <h2
+              id="history-heading"
+              className="font-serif text-xl font-semibold text-foreground"
+            >
+              Previously generated
+            </h2>
+            <button
+              type="button"
+              onClick={handleClearHistory}
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Clear history
+            </button>
+          </div>
+          <ul className="mt-3 space-y-2">
+            {history.map((entry) => (
+              <li key={entry.id}>
+                <Card className="flex flex-wrap items-center justify-between gap-3 py-3">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <Badge tone="neutral">
+                      {DETAIL_LEVEL_LABELS[entry.recap.detailLevel]}
+                    </Badge>
+                    <span className="text-foreground">
+                      {entry.recap.boundaryLabel}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {formatHistoryDate(entry.createdAt)}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleViewHistoryEntry(entry)}
+                    className="text-sm font-medium text-primary underline hover:opacity-80"
+                  >
+                    View
+                  </button>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
